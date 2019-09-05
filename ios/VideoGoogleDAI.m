@@ -30,17 +30,17 @@ NSString* _assetKey;
 
 - (void)setContentSourceID:(NSString *)contentSourceID
 {
-    _contentSourceID = contentSourceID;
+    _contentSourceID = ![contentSourceID isEqualToString:@""] ? contentSourceID : nil;
 }
 
 - (void)setVideoID:(NSString *)videoID
 {
-    _videoID = videoID;
+    _videoID = ![videoID isEqualToString:@""] ? videoID : nil;
 }
 
 - (void)setAssetKey:(NSString *)assetKey
 {
-    _assetKey = assetKey;
+    _assetKey = ![assetKey isEqualToString:@""] ? assetKey : nil;
 }
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
@@ -108,7 +108,7 @@ NSString* _assetKey;
 
     // Create a stream request. Use one of "Live stream request" or "VOD request".
     IMAStreamRequest *request;
-    if (_assetKey) {
+    if (_assetKey != nil) {
         // Live stream request.
         request = [[IMALiveStreamRequest alloc] initWithAssetKey:_assetKey
                                                 adDisplayContainer:_adDisplayContainer
