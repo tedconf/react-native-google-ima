@@ -128,7 +128,7 @@ NSString* _assetKey;
 #pragma mark AdsLoader Delegates
 
 - (void)adsLoader:(IMAAdsLoader *)loader adsLoadedWithData:(IMAAdsLoadedData *)adsLoadedData {
-//    NSLog(@"IMA >>> Stream created with: %@.", adsLoadedData.streamManager.streamId);
+    NSLog(@"IMA >>> Stream created with: %@.", adsLoadedData.streamManager.streamId);
     // adsLoadedData.streamManager is set because we made an IMAStreamRequest.
     _streamManager = adsLoadedData.streamManager;
     _streamManager.delegate = self;
