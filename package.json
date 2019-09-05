@@ -23,14 +23,12 @@
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "peerDependencies": {
-    "react": "^16.8.1",
-    "react-native": ">=0.59.0-rc.0 <1.0.x"
-  },
-  "devDependencies": {
     "prop-types": "^15.7.2",
     "react": "^16.8.3",
     "react-native": "^0.59.10",
     "react-native-video": "4.4.1"
+  },
+  "devDependencies": {
   },
   "dependencies": {
   }
