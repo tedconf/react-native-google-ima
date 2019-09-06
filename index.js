@@ -56,6 +56,7 @@ class RNGoogleIMA extends React.PureComponent {
       contentSourceID,
       videoID,
       assetKey,
+      adTagParameters,
       style,
       ...playerProps
     } = this.props;
@@ -66,6 +67,7 @@ class RNGoogleIMA extends React.PureComponent {
         contentSourceID={contentSourceID}
         videoID={videoID}
         assetKey={assetKey}
+        adTagParameters={adTagParameters}
         // onAdsLoaderLoaded={this.onAdsLoaderLoaded}
         // onAdsLoaderFailed={this.onAdsLoaderFailed}
         // onStreamManagerEvent={this.onStreamManagerEvent}
@@ -89,6 +91,7 @@ RNGoogleIMA.propTypes = {
   contentSourceID: PropTypes.string,
   videoID: PropTypes.string,
   assetKey: PropTypes.string,
+  adTagParameters: PropTypes.objectOf(PropTypes.string),
   style: ViewPropTypes.style,
 };
 

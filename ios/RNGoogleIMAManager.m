@@ -26,6 +26,7 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_VIEW_PROPERTY(contentSourceID, NSString);
 RCT_EXPORT_VIEW_PROPERTY(videoID, NSString);
 RCT_EXPORT_VIEW_PROPERTY(assetKey, NSString);
+RCT_EXPORT_VIEW_PROPERTY(adTagParameters, NSDictionary);
 
 RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderLoaded, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderFailed, RCTBubblingEventBlock);

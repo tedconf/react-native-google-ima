@@ -23,6 +23,7 @@ IMAAVPlayerVideoDisplay* _avPlayerVideoDisplay;
 NSString* _contentSourceID;
 NSString* _videoID;
 NSString* _assetKey;
+NSDictionary* _adTagParameters;
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
 {
@@ -45,6 +46,11 @@ NSString* _assetKey;
 - (void)setAssetKey:(NSString *)assetKey
 {
     _assetKey = ![assetKey isEqualToString:@""] ? assetKey : nil;
+}
+
+- (void)setAdTagParameters:(NSDictionary *)adTagParameters
+{
+    _adTagParameters = adTagParameters != nil && adTagParameters.count > 0 ? adTagParameters : nil;
 }
 
 - (BOOL)isRCTVideo:(UIView *)view {
@@ -114,11 +120,11 @@ NSString* _assetKey;
 - (void)requestStreamForSource:(NSDictionary *)source {
     // Create an ad display container for ad rendering.
     _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
-    
+
     // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
     _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
     // avPlayerVideoDisplay.delegate = self;
-    
+
     // Create a stream request. Use one of "Live stream request" or "VOD request".
     IMAStreamRequest *request;
     if (_assetKey != nil) {
@@ -134,7 +140,9 @@ NSString* _assetKey;
                                                     adDisplayContainer:_adDisplayContainer
                                                           videoDisplay:_avPlayerVideoDisplay];
     }
-    [request setAdTagParameters:@{@"cust_params":@"dfptest=REACT_NATIVE_DEV", @"iu":@"/5641/ted3/mobile"}];
+    if (_adTagParameters != nil) {
+        [request setAdTagParameters:_adTagParameters];
+    }
     [_adsLoader requestStreamWithRequest:request];
 }
 
@@ -179,12 +187,14 @@ NSString* _assetKey;
         default:
             break;
     }
-    
-    self.onStreamManagerEvent(
-                              @{
-                                @"adEvent": convertAdEvent(event),
-                                @"target": self.reactTag
-                                });
+
+    if (self.onStreamManagerEvent) {
+        self.onStreamManagerEvent(
+                                  @{
+                                    @"adEvent": convertAdEvent(event),
+                                    @"target": self.reactTag
+                                    });
+    }
 }
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
