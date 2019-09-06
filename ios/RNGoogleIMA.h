@@ -9,7 +9,7 @@
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher NS_DESIGNATED_INITIALIZER;
 
-- (AVPlayer *)didSetupPlayerWithPlayerItem:(AVPlayerItem *) playerItem withSource:(NSDictionary *) source;
+- (BOOL)willSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onAdsLoaderFailed;
 @property (nonatomic, copy) RCTBubblingEventBlock onAdsLoaderLoaded;

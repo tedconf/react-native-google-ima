@@ -35,30 +35,34 @@ class RNGoogleIMA extends React.PureComponent {
     } = this.props;
 
     return (
-      <>
-        <RCTRNGoogleIMA
-          style={style}
-          contentSourceID={contentSourceID}
-          videoID={videoID}
-          assetKey={assetKey}
-          onAdsLoaderLoaded={({ nativeEvent: { adLoadedData } }) => {
-            console.log(`DAI >>> onAdsLoaderLoaded`, adLoadedData);
-          }}
-          onAdsLoaderFailed={({ nativeEvent: { adErrorData } }) => {
-            console.log(`DAI >>> onAdsLoaderFailed`, adErrorData);
-          }}
-          onStreamManagerEvent={({ nativeEvent: { adEvent } }) => {
-            console.log(`DAI >>> onStreamManagerEvent`, adEvent);
-          }}
-        >
-          <RNVideo
-            {...playerProps}
-            nativeID="RNGoogleIMAPlayer"
-            ref={this.onPlayerRef}
-            style={styles.videoPlayer}
-          />
-        </RCTRNGoogleIMA>
-      </>
+      <RCTRNGoogleIMA
+        style={style}
+        contentSourceID={contentSourceID}
+        videoID={videoID}
+        assetKey={assetKey}
+        onAdsLoaderLoaded={({ nativeEvent: event }) => {
+          console.log(`DAI >>> onAdsLoaderLoaded`, event.adLoadedData);
+        }}
+        onAdsLoaderFailed={({ nativeEvent: event }) => {
+          console.log(`DAI >>> onAdsLoaderFailed`, event);
+        }}
+        onStreamManagerEvent={({ nativeEvent: event }) => {
+          if (
+            ['RESUME', 'STREAM_STARTED', 'STREAM_LOADED', 'STARTED'].indexOf(
+              event.adEvent.type,
+            ) !== -1
+          ) {
+            console.log(`DAI >>> onStreamManagerEvent`, event.adEvent);
+          }
+        }}
+      >
+        <RNVideo
+          {...playerProps}
+          nativeID="RNGoogleIMAPlayer"
+          ref={this.onPlayerRef}
+          style={styles.videoPlayer}
+        />
+      </RCTRNGoogleIMA>
     );
   }
 }
