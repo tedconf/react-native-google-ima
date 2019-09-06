@@ -30,5 +30,7 @@ RCT_EXPORT_VIEW_PROPERTY(assetKey, NSString);
 RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderLoaded, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderFailed, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onStreamManagerEvent, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onStreamManagerAdProgress, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onStreamManagerAdError, RCTBubblingEventBlock);
 
 @end

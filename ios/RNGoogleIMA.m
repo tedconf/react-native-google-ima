@@ -47,22 +47,29 @@ NSString* _assetKey;
     _assetKey = ![assetKey isEqualToString:@""] ? assetKey : nil;
 }
 
+- (BOOL)isRCTVideo:(UIView *)view {
+    return [view.nativeID isEqualToString: rctVideoNativeID] && [view respondsToSelector:@selector(setRctVideoDelegate:)];
+}
+
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
-    NSLog(@"IMA >>> insertReactSubview");
     [super insertReactSubview:subview atIndex:atIndex];
-    if ([subview.nativeID isEqualToString: rctVideoNativeID]) {
-        NSLog(@"IMA >>> insertReactSubview is RNGoogleIMA");
+    if ([self isRCTVideo:subview]) {
         [self setupRCTVideo:(RCTVideo *)subview];
+    } else if (subview.reactSubviews.count > 0) {
+        for (int i = 0; i < subview.reactSubviews.count; i++) {
+            UIView* subsubview = [subview.reactSubviews objectAtIndex:i];
+            if ([self isRCTVideo:subsubview]) {
+                [self setupRCTVideo:(RCTVideo *)subsubview];
+            }
+        }
     }
 }
 
 - (void)removeReactSubview:(UIView *)subview
 {
     [super removeReactSubview:subview];
-    NSLog(@"IMA >>> removeReactSubview");
     if ([subview.nativeID isEqualToString: rctVideoNativeID]) {
-        NSLog(@"IMA >>> removeReactSubview was RNGoogleIMA");
         [self setupRCTVideo:nil];
     }
 }
@@ -81,7 +88,6 @@ NSString* _assetKey;
 }
 
 -(BOOL) willSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
-    NSLog(@"IMA >>> willSetupPlayerItem:forSource");
     if (_contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
         _fallbackPlayerItem = playerItem;
         _source = source;
@@ -108,11 +114,11 @@ NSString* _assetKey;
 - (void)requestStreamForSource:(NSDictionary *)source {
     // Create an ad display container for ad rendering.
     _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
-
+    
     // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
     _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
     // avPlayerVideoDisplay.delegate = self;
-
+    
     // Create a stream request. Use one of "Live stream request" or "VOD request".
     IMAStreamRequest *request;
     if (_assetKey != nil) {
@@ -163,197 +169,17 @@ NSString* _assetKey;
 #pragma mark StreamManager Delegates
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdEvent:(IMAAdEvent *)event {
-    // NSLog(@"IMA >>> StreamManager event %@.", event.typeString);
     switch (event.type) {
-
-            /**
-             *  Stream has loaded (only used for dynamic ad insertion).
-             */
-            // case kIMAAdEvent_STREAM_LOADED: {
-            //     break;
-            // }
-
-            /**
-             *  Stream has started playing (only used for dynamic ad insertion). Start
-             *  Picture-in-Picture here if applicable.
-             */
         case kIMAAdEvent_STREAM_STARTED: {
-            // NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_STREAM_STARTED");
-            // NSLog(@"IMA >>> self->_player.currentItem.duration: %f", CMTimeGetSeconds(_contentPlayer.currentItem.duration));
             AVPlayerItem* playerItem = _contentPlayer.currentItem;
             [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:_contentPlayer];
             [_rctVideo observeValueForKeyPath:statusKeyPath ofObject:playerItem change:nil context:nil];
             break;
         }
-
-            // #pragma mark ADEvent - Advertising Events
-            // /**
-            // *  Ad break ready.
-            // */
-            // case kIMAAdEvent_AD_BREAK_READY: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_AD_BREAK_READY");
-            //     break;
-            // }
-            // /**
-            // *  Ad break started (only used for dynamic ad insertion).
-            // */
-            // case kIMAAdEvent_AD_BREAK_STARTED: {
-            //     // [_avPlayerVideoDisplay pause];
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_AD_BREAK_STARTED");
-            //     NSLog(@"Ad break started");
-            //     break;
-            // }
-            // /**
-            // *  Ad break ended (only used for dynamic ad insertion).
-            // */
-            // case kIMAAdEvent_AD_BREAK_ENDED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_AD_BREAK_ENDED");
-            //     NSLog(@"Ad break ended");
-            //     break;
-            // }
-            // /**
-            // *  Ad period started is fired when an ad period starts. This includes the
-            // *  entire ad break including slate as well. This event will be fired even for
-            // *  ads that are being replayed or when seeking to the middle of an ad break.
-            // *  (only used for dynamic ad insertion).
-            // */
-            // case kIMAAdEvent_AD_PERIOD_STARTED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_AD_PERIOD_STARTED");
-            //     NSLog(@"Ad period started");
-            //     // [self->_player pause];
-            //     break;
-            // }
-            // /**
-            // *  Ad period ended (only used for dynamic ad insertion).
-            // */
-            // case kIMAAdEvent_AD_PERIOD_ENDED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_AD_PERIOD_ENDED");
-            //     NSLog(@"Ad period ended");
-            //     break;
-            // }
-            // /**
-            // *  All ads managed by the ads manager have completed.
-            // */
-            // case kIMAAdEvent_ALL_ADS_COMPLETED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_ALL_ADS_COMPLETED");
-            //     break;
-            // }
-
-            // #pragma mark ADEvent - Single AD Events
-            // /**
-            // *  An ad was loaded.
-            // */
-            // case kIMAAdEvent_LOADED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_LOADED");
-            //     // [self->_player pause];
-            //     break;
-            // }
-            /**
-             *  Ad has started.
-             */
-            // case kIMAAdEvent_STARTED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_STARTED");
-            //     NSString *extendedAdPodInfo = [[NSString alloc]
-            //                                     initWithFormat:@"Showing ad %ld/%ld, bumper: %@, title: %@, description: %@, contentType:"
-            //                                     @"%@, pod index: %ld, time offset: %lf, max duration: %lf.",
-            //                                     (long)event.ad.adPodInfo.adPosition, (long)event.ad.adPodInfo.totalAds,
-            //                                     event.ad.adPodInfo.isBumper ? @"YES" : @"NO", event.ad.adTitle,
-            //                                     event.ad.adDescription, event.ad.contentType, (long)event.ad.adPodInfo.podIndex,
-            //                                     event.ad.adPodInfo.timeOffset, event.ad.adPodInfo.maxDuration];
-
-            //     NSLog(@"IMA >>> extendedAdPodInfo %@", extendedAdPodInfo);
-            //     // [self->_player pause];
-            //     break;
-            // }
-
-            // /**
-            // *  Ad clicked.
-            // */
-            // case kIMAAdEvent_CLICKED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_CLICKED");
-            //     break;
-            // }
-            // /**
-            // *  Ad tapped.
-            // */
-            // case kIMAAdEvent_TAPPED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_TAPPED");
-            //     break;
-            // }
-            // /**
-            // *  Cuepoints changed for VOD stream (only used for dynamic ad insertion).
-            // *  For this event, the <code>IMAAdEvent.adData</code> property contains a list of
-            // *  <code>IMACuepoint</code>s at <code>IMAAdEvent.adData[@"cuepoints"]</code>.
-            // */
-            // case kIMAAdEvent_CUEPOINTS_CHANGED: {
-            //     // Avoid Ad Skipping
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_CUEPOINTS_CHANGED");
-            //     break;
-            // }
-            // /**
-            // *  A log event for the ads being played. These are typically non fatal errors.
-            // */
-            // case kIMAAdEvent_LOG: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_LOG");
-            //     break;
-            // }
-
-            // /**
-            // *  Ad paused.
-            // */
-            // case kIMAAdEvent_PAUSE: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_PAUSE");
-            //     break;
-            // }
-            // /**
-            // *  Ad resumed.
-            // */
-            // case kIMAAdEvent_RESUME: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_RESUME");
-            //     // [self->_player pause];
-            //     break;
-            // }
-            // /**
-            // *  Ad has skipped.
-            // */
-            // case kIMAAdEvent_SKIPPED: {
-            //     NSLog(@"IMA >>> StreamManager event (%@/%@).", event.typeString, @"kIMAAdEvent_SKIPPED");
-            //     break;
-            // }
-            // #pragma mark ADEvent - Single AD Events - Progress
-            // /**
-            // *  First quartile of a linear ad was reached.
-            // */
-            // case kIMAAdEvent_FIRST_QUARTILE: {
-            //     NSLog(@"IMA >>> StreamManager Single Ad %@ (%@).", event.typeString, @"kIMAAdEvent_FIRST_QUARTILE");
-            //     break;
-            // }
-            // /**
-            // *  Midpoint of a linear ad was reached.
-            // */
-            // case kIMAAdEvent_MIDPOINT: {
-            //     NSLog(@"IMA >>> StreamManager Single Ad %@ (%@).", event.typeString, @"kIMAAdEvent_MIDPOINT");
-            //     break;
-            // }
-            // /**
-            // *  Third quartile of a linear ad was reached.
-            // */
-            // case kIMAAdEvent_THIRD_QUARTILE: {
-            //     NSLog(@"IMA >>> StreamManager Single Ad %@ (%@).", event.typeString, @"kIMAAdEvent_THIRD_QUARTILE");
-            //     break;
-            // }
-            // /**
-            // *  Single ad has finished.
-            // */
-            // case kIMAAdEvent_COMPLETE: {
-            //     NSLog(@"IMA >>> StreamManager Single Ad %@ (%@).", event.typeString, @"kIMAAdEvent_COMPLETE");
-            //     break;
-            // }
-
         default:
             break;
     }
-
+    
     self.onStreamManagerEvent(
                               @{
                                 @"adEvent": convertAdEvent(event),
@@ -362,14 +188,28 @@ NSString* _assetKey;
 }
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
-    NSLog(@"IMA >>> StreamManager error with type: %ld\ncode: %ld\nmessage: %@", error.type, error.code,
-          error.message);
-    //    [self.contentPlayer play];
+    if (self.onStreamManagerAdError) {
+        self.onStreamManagerAdError(
+                                    @{
+                                      @"error": convertAdError(error),
+                                      @"target": self.reactTag
+                                      });
+    }
 }
 
-- (void)streamManager:(IMAStreamManager *)streamManager adDidProgressToTime:(NSTimeInterval)time adDuration:(NSTimeInterval)adDuration adPosition:(NSInteger)adPosition totalAds:(NSInteger)totalAds adBreakDuration:(NSTimeInterval)adBreakDuration {
-    // onAdProgress
-    //    NSLog(@"IMA >>> (void)streamManager:(IMAStreamManager *)streamManager adDidProgressToTime:(NSTimeInterval)time adDuration:(NSTimeInterval)adDuration adPosition:(NSInteger)adPosition totalAds:(NSInteger)totalAds adBreakDuration:(NSTimeInterval)adBreakDuration");
+- (void)streamManager:(IMAStreamManager *)streamManager adDidProgressToTime:(NSTimeInterval)progress adDuration:(NSTimeInterval)adDuration adPosition:(NSInteger)adPosition totalAds:(NSInteger)totalAds adBreakDuration:(NSTimeInterval)adBreakDuration {
+    if (self.onStreamManagerAdProgress) {
+        self.onStreamManagerAdProgress(
+                                       @{
+                                         @"streamManager": convertStreamManager(streamManager),
+                                         @"progress": [NSNumber numberWithDouble:progress],
+                                         @"adDuration": [NSNumber numberWithDouble:adDuration],
+                                         @"adPosition": [NSNumber numberWithLong:adPosition],
+                                         @"totalAds": [NSNumber numberWithLong:totalAds],
+                                         @"adBreakDuration": [NSNumber numberWithDouble:adBreakDuration],
+                                         @"target": self.reactTag
+                                         });
+    }
 }
 
 // #pragma mark AVPlayerVideoDisplay Delegates

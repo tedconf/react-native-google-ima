@@ -14,5 +14,8 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onAdsLoaderFailed;
 @property (nonatomic, copy) RCTBubblingEventBlock onAdsLoaderLoaded;
 @property (nonatomic, copy) RCTBubblingEventBlock onStreamManagerEvent;
+@property (nonatomic, copy) RCTBubblingEventBlock onStreamManagerAdProgress;
+@property (nonatomic, copy) RCTBubblingEventBlock onStreamManagerAdError;
+
 
 @end

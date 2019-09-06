@@ -23,6 +23,32 @@ class RNGoogleIMA extends React.PureComponent {
   seek = (time, tolerance) =>
     this.playerRef && this.playerRef.seek(time, tolerance);
 
+  onAdsLoaderLoaded = ({ nativeEvent: event }) => {
+    console.log(`DAI >>> onAdsLoaderLoaded`, event.adLoadedData);
+  };
+
+  onAdsLoaderFailed = ({ nativeEvent: event }) => {
+    console.log(`DAI >>> onAdsLoaderFailed`, event);
+  };
+
+  onStreamManagerEvent = ({ nativeEvent: event }) => {
+    if (
+      ['RESUME', 'STREAMSTARTED', 'STREAM_LOADED', 'STARTED'].indexOf(
+        event.adEvent.type,
+      ) !== -1
+    ) {
+      console.log(`DAI >>> onStreamManagerEvent`, event.adEvent);
+    }
+  };
+
+  onStreamManagerAdProgress = ({ nativeEvent: event }) => {
+    console.log(`DAI >>> onStreamManagerAdProgress`, event);
+  };
+
+  onStreamManagerAdError = ({ nativeEvent: event }) => {
+    console.log(`DAI >>> onStreamManagerAdError`, event);
+  };
+
   render() {
     const {
       playerRef,
@@ -40,21 +66,11 @@ class RNGoogleIMA extends React.PureComponent {
         contentSourceID={contentSourceID}
         videoID={videoID}
         assetKey={assetKey}
-        onAdsLoaderLoaded={({ nativeEvent: event }) => {
-          console.log(`DAI >>> onAdsLoaderLoaded`, event.adLoadedData);
-        }}
-        onAdsLoaderFailed={({ nativeEvent: event }) => {
-          console.log(`DAI >>> onAdsLoaderFailed`, event);
-        }}
-        onStreamManagerEvent={({ nativeEvent: event }) => {
-          if (
-            ['RESUME', 'STREAM_STARTED', 'STREAM_LOADED', 'STARTED'].indexOf(
-              event.adEvent.type,
-            ) !== -1
-          ) {
-            console.log(`DAI >>> onStreamManagerEvent`, event.adEvent);
-          }
-        }}
+        // onAdsLoaderLoaded={this.onAdsLoaderLoaded}
+        // onAdsLoaderFailed={this.onAdsLoaderFailed}
+        // onStreamManagerEvent={this.onStreamManagerEvent}
+        // onStreamManagerAdProgress={this.onStreamManagerAdProgress}
+        // onStreamManagerAdError={this.onStreamManagerAdError}
       >
         <RNVideo
           {...playerProps}
