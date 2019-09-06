@@ -7,55 +7,72 @@ import {
 import PropTypes from 'prop-types';
 import RNVideo from 'react-native-video';
 
-const RCTVideoGoogleDAI = requireNativeComponent('RCTVideoGoogleDAI', null);
+const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 
-const VideoGoogleDAI = ({
-  playerRef,
-  daiRef,
-  contentSourceID,
-  videoID,
-  assetKey,
-  style,
-  ...playerProps
-}) => {
-  const videoRef = React.useRef();
+class RNGoogleIMA extends React.PureComponent {
+  plyerRef = null;
 
-  React.useEffect(() => {
-    if (videoRef.current) {
-      playerRef(videoRef.current);
+  onPlayerRef = ref => {
+    const { playerRef } = this.props;
+    this.playerRef = ref;
+    if (playerRef) {
+      playerRef(ref);
     }
-  }, [playerRef]);
+  };
 
-  return (
-    <>
-      <RCTVideoGoogleDAI
-        ref={daiRef}
-        style={style}
-        contentSourceID={contentSourceID}
-        videoID={videoID}
-        assetKey={assetKey}
-      >
-        <RNVideo
-          nativeID="RCTVideoGoogleDAI"
-          {...playerProps}
-          ref={videoRef}
-          style={styles.videoPlayer}
-        />
-      </RCTVideoGoogleDAI>
-    </>
-  );
-};
+  seek = (time, tolerance) =>
+    this.playerRef && this.playerRef.seek(time, tolerance);
 
-VideoGoogleDAI.propTypes = {
+  render() {
+    const {
+      playerRef,
+      daiRef,
+      contentSourceID,
+      videoID,
+      assetKey,
+      style,
+      ...playerProps
+    } = this.props;
+
+    return (
+      <>
+        <RCTRNGoogleIMA
+          style={style}
+          contentSourceID={contentSourceID}
+          videoID={videoID}
+          assetKey={assetKey}
+          onAdsLoaderLoaded={({ nativeEvent: { adLoadedData } }) => {
+            console.log(`DAI >>> onAdsLoaderLoaded`, adLoadedData);
+          }}
+          onAdsLoaderFailed={({ nativeEvent: { adErrorData } }) => {
+            console.log(`DAI >>> onAdsLoaderFailed`, adErrorData);
+          }}
+          onStreamManagerEvent={({ nativeEvent: { adEvent } }) => {
+            console.log(`DAI >>> onStreamManagerEvent`, adEvent);
+          }}
+        >
+          <RNVideo
+            {...playerProps}
+            nativeID="RNGoogleIMAPlayer"
+            ref={this.onPlayerRef}
+            style={styles.videoPlayer}
+          />
+        </RCTRNGoogleIMA>
+      </>
+    );
+  }
+}
+
+RNGoogleIMA.propTypes = {
   playerRef: PropTypes.func,
   daiRef: PropTypes.func,
   contentSourceID: PropTypes.string,
   videoID: PropTypes.string,
   assetKey: PropTypes.string,
-  style: ViewPropTypes,
+  style: ViewPropTypes.style,
 };
 
-export default VideoGoogleDAI;
+export default RNGoogleIMA;
 
 const styles = StyleSheet.create({
   videoPlayer: {

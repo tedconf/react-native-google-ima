@@ -1,6 +1,6 @@
 #import <React/RCTViewManager.h>
 #import <React/RCTBridgeModule.h>
 
-@interface RCTVideoGoogleDAIManager : RCTViewManager <RCTBridgeModule>
+@interface RNGoogleIMAManager : RCTViewManager <RCTBridgeModule>
 
 @end

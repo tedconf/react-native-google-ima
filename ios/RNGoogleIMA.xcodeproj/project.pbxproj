@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B14E759F2320093400E87672 /* VideoGoogleDAI.m in Sources */ = {isa = PBXBuildFile; fileRef = B14E759D2320093400E87672 /* VideoGoogleDAI.m */; };
-		B14E75E123202AE000E87672 /* VideoGoogleDAIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B14E75E023202AE000E87672 /* VideoGoogleDAIManager.m */; };
+		B14A91722321DC2B00F252FC /* RNGoogleIMAConverters.m in Sources */ = {isa = PBXBuildFile; fileRef = B14A91712321DC2A00F252FC /* RNGoogleIMAConverters.m */; };
+		B14E759F2320093400E87672 /* RNGoogleIMA.m in Sources */ = {isa = PBXBuildFile; fileRef = B14E759D2320093400E87672 /* RNGoogleIMA.m */; };
+		B14E75E123202AE000E87672 /* RNGoogleIMAManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B14E75E023202AE000E87672 /* RNGoogleIMAManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,11 +25,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		134814201AA4EA6300B7C361 /* libVideoGoogleDAI.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libVideoGoogleDAI.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B14E759D2320093400E87672 /* VideoGoogleDAI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoGoogleDAI.m; sourceTree = "<group>"; };
-		B14E759E2320093400E87672 /* VideoGoogleDAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoGoogleDAI.h; sourceTree = "<group>"; };
-		B14E75DF23202AE000E87672 /* VideoGoogleDAIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoGoogleDAIManager.h; sourceTree = "<group>"; };
-		B14E75E023202AE000E87672 /* VideoGoogleDAIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoGoogleDAIManager.m; sourceTree = "<group>"; };
+		134814201AA4EA6300B7C361 /* libRNGoogleIMA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNGoogleIMA.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		B14A91712321DC2A00F252FC /* RNGoogleIMAConverters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNGoogleIMAConverters.m; sourceTree = "<group>"; };
+		B14E759D2320093400E87672 /* RNGoogleIMA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNGoogleIMA.m; sourceTree = "<group>"; };
+		B14E759E2320093400E87672 /* RNGoogleIMA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNGoogleIMA.h; sourceTree = "<group>"; };
+		B14E75DF23202AE000E87672 /* RNGoogleIMAManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNGoogleIMAManager.h; sourceTree = "<group>"; };
+		B14E75E023202AE000E87672 /* RNGoogleIMAManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNGoogleIMAManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,7 +47,7 @@
 		134814211AA4EA7D00B7C361 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				134814201AA4EA6300B7C361 /* libVideoGoogleDAI.a */,
+				134814201AA4EA6300B7C361 /* libRNGoogleIMA.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -53,10 +55,11 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				B14E75DF23202AE000E87672 /* VideoGoogleDAIManager.h */,
-				B14E75E023202AE000E87672 /* VideoGoogleDAIManager.m */,
-				B14E759E2320093400E87672 /* VideoGoogleDAI.h */,
-				B14E759D2320093400E87672 /* VideoGoogleDAI.m */,
+				B14A91712321DC2A00F252FC /* RNGoogleIMAConverters.m */,
+				B14E75DF23202AE000E87672 /* RNGoogleIMAManager.h */,
+				B14E75E023202AE000E87672 /* RNGoogleIMAManager.m */,
+				B14E759E2320093400E87672 /* RNGoogleIMA.h */,
+				B14E759D2320093400E87672 /* RNGoogleIMA.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -64,9 +67,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		58B511DA1A9E6C8500147676 /* VideoGoogleDAI */ = {
+		58B511DA1A9E6C8500147676 /* RNGoogleIMA */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "VideoGoogleDAI" */;
+			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNGoogleIMA" */;
 			buildPhases = (
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
@@ -76,9 +79,9 @@
 			);
 			dependencies = (
 			);
-			name = VideoGoogleDAI;
+			name = RNGoogleIMA;
 			productName = RCTDataManager;
-			productReference = 134814201AA4EA6300B7C361 /* libVideoGoogleDAI.a */;
+			productReference = 134814201AA4EA6300B7C361 /* libRNGoogleIMA.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +98,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "VideoGoogleDAI" */;
+			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNGoogleIMA" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -108,7 +111,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				58B511DA1A9E6C8500147676 /* VideoGoogleDAI */,
+				58B511DA1A9E6C8500147676 /* RNGoogleIMA */,
 			);
 		};
 /* End PBXProject section */
@@ -118,8 +121,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B14E759F2320093400E87672 /* VideoGoogleDAI.m in Sources */,
-				B14E75E123202AE000E87672 /* VideoGoogleDAIManager.m in Sources */,
+				B14E759F2320093400E87672 /* RNGoogleIMA.m in Sources */,
+				B14E75E123202AE000E87672 /* RNGoogleIMAManager.m in Sources */,
+				B14A91722321DC2B00F252FC /* RNGoogleIMAConverters.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,7 +234,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = VideoGoogleDAI;
+				PRODUCT_NAME = RNGoogleIMA;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -246,7 +250,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = VideoGoogleDAI;
+				PRODUCT_NAME = RNGoogleIMA;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -254,7 +258,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "VideoGoogleDAI" */ = {
+		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNGoogleIMA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511ED1A9E6C8500147676 /* Debug */,
@@ -263,7 +267,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "VideoGoogleDAI" */ = {
+		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNGoogleIMA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,

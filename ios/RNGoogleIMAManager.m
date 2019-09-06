@@ -1,16 +1,16 @@
-#import "VideoGoogleDAIManager.h"
-#import "VideoGoogleDAI.h"
+#import "RNGoogleIMAManager.h"
+#import "RNGoogleIMA.h"
 #import <React/RCTBridge.h>
 #import <React/RCTUIManager.h>
 #import <AVFoundation/AVFoundation.h>
 
-@implementation RCTVideoGoogleDAIManager
+@implementation RNGoogleIMAManager
 
 RCT_EXPORT_MODULE();
 
 - (UIView *)view
 {
-    return [[RCTVideoGoogleDAI alloc] initWithEventDispatcher:self.bridge.eventDispatcher];
+    return [[RNGoogleIMA alloc] initWithEventDispatcher:self.bridge.eventDispatcher];
 }
 
 - (dispatch_queue_t)methodQueue
@@ -26,6 +26,9 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_VIEW_PROPERTY(contentSourceID, NSString);
 RCT_EXPORT_VIEW_PROPERTY(videoID, NSString);
 RCT_EXPORT_VIEW_PROPERTY(assetKey, NSString);
-// RCT_EXPORT_VIEW_PROPERTY(src, NSString);
+
+RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderLoaded, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderFailed, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onStreamManagerEvent, RCTBubblingEventBlock);
 
 @end
