@@ -1,7 +1,7 @@
 {
-  "name": "react-native-video-google-dai",
-  "title": "React Native Video Google DAI",
-  "version": "0.0.1",
+  "name": "react-native-google-ima",
+  "title": "React Native Google IMA",
+  "version": "0.0.2",
   "description": "TODO",
   "main": "index.js",
   "scripts": {
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/github_account/react-native-video-google-dai.git",
-    "baseUrl": "https://github.com/github_account/react-native-video-google-dai"
+    "url": "git+https://github.com/github_account/react-native-google-ima.git",
+    "baseUrl": "https://github.com/github_account/react-native-google-ima"
   },
   "keywords": [
     "react-native"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "yourname@email.com"
+    "name": "Sid Ferreira",
+    "email": "sid@ted.com"
   },
   "license": "MIT",
   "licenseFilename": "LICENSE",

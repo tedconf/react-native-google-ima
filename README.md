@@ -1,12 +1,12 @@
-# react-native-video-google-dai
+# react-native-google-ima
 
 ## Getting started
 
-`$ npm install react-native-video-google-dai --save`
+`$ npm install react-native-google-ima --save`
 
 ### Mostly automatic installation
 
-`$ react-native link react-native-video-google-dai`
+`$ react-native link react-native-google-ima`
 
 ### Manual installation
 
@@ -14,8 +14,8 @@
 #### iOS
 
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-2. Go to `node_modules` ➜ `react-native-video-google-dai` and add `VideoGoogleDai.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libVideoGoogleDai.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
+2. Go to `node_modules` ➜ `react-native-google-ima` and add `RNGoogleIMA.xcodeproj`
+3. In XCode, in the project navigator, select your project. Add `libRNGoogleIMA.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
 4. Run your project (`Cmd+R`)<
 
 #### Android
@@ -25,19 +25,20 @@
   - Add `new VideoGoogleDaiPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
   	```
-  	include ':react-native-video-google-dai'
-  	project(':react-native-video-google-dai').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-video-google-dai/android')
+  	include ':react-native-google-ima'
+  	project(':react-native-google-ima').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-google-ima/android')
   	```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```
-      compile project(':react-native-video-google-dai')
+      compile project(':react-native-google-ima')
   	```
 
 
 ## Usage
 ```javascript
-import VideoGoogleDai from 'react-native-video-google-dai';
+import VideoIMA from 'react-native-google-ima';
 
-// TODO: What to do with the module?
-VideoGoogleDai;
+const MyModule = () => (
+	<VideoIMA />
+)
 ```

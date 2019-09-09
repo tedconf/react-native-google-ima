@@ -24,11 +24,11 @@ class RNGoogleIMA extends React.PureComponent {
     this.playerRef && this.playerRef.seek(time, tolerance);
 
   onAdsLoaderLoaded = ({ nativeEvent: event }) => {
-    console.log(`DAI >>> onAdsLoaderLoaded`, event.adLoadedData);
+    console.log(`IMA >>> onAdsLoaderLoaded`, event.adLoadedData);
   };
 
   onAdsLoaderFailed = ({ nativeEvent: event }) => {
-    console.log(`DAI >>> onAdsLoaderFailed`, event);
+    console.log(`IMA >>> onAdsLoaderFailed`, event);
   };
 
   onStreamManagerEvent = ({ nativeEvent: event }) => {
@@ -37,22 +37,22 @@ class RNGoogleIMA extends React.PureComponent {
         event.adEvent.type,
       ) !== -1
     ) {
-      console.log(`DAI >>> onStreamManagerEvent`, event.adEvent);
+      console.log(`IMA >>> onStreamManagerEvent`, event.adEvent);
     }
   };
 
   onStreamManagerAdProgress = ({ nativeEvent: event }) => {
-    console.log(`DAI >>> onStreamManagerAdProgress`, event);
+    console.log(`IMA >>> onStreamManagerAdProgress`, event);
   };
 
   onStreamManagerAdError = ({ nativeEvent: event }) => {
-    console.log(`DAI >>> onStreamManagerAdError`, event);
+    console.log(`IMA >>> onStreamManagerAdError`, event);
   };
 
   render() {
     const {
       playerRef,
-      daiRef,
+      imaRef,
       contentSourceID,
       videoID,
       assetKey,
@@ -87,7 +87,7 @@ class RNGoogleIMA extends React.PureComponent {
 
 RNGoogleIMA.propTypes = {
   playerRef: PropTypes.func,
-  daiRef: PropTypes.func,
+  imaRef: PropTypes.func,
   contentSourceID: PropTypes.string,
   videoID: PropTypes.string,
   assetKey: PropTypes.string,
