@@ -1,104 +1,60 @@
 import React from 'react';
-import {
-  requireNativeComponent,
-  StyleSheet,
-  ViewPropTypes,
-} from 'react-native';
+import { requireNativeComponent, ViewPropTypes } from 'react-native';
 import PropTypes from 'prop-types';
-import RNVideo from 'react-native-video';
 
 const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 
-class RNGoogleIMA extends React.PureComponent {
-  plyerRef = null;
+const RNGoogleIMA = React.forwardRef((props, ref) => {
+  const {
+    children,
+    contentSourceID = null,
+    videoID = null,
+    assetKey = null,
+    adTagParameters = null,
+    onAdsLoaderLoaded = null,
+    onAdsLoaderFailed = null,
+    onStreamManagerEvent = null,
+    onStreamManagerAdProgress = null,
+    onStreamManagerAdError = null,
+    style,
+  } = props;
 
-  onPlayerRef = ref => {
-    const { playerRef } = this.props;
-    this.playerRef = ref;
-    if (playerRef) {
-      playerRef(ref);
+  React.useEffect(() => {
+    if (RCTRNGoogleIMA) {
+      ref({});
     }
-  };
+  }, [ref]);
 
-  seek = (time, tolerance) =>
-    this.playerRef && this.playerRef.seek(time, tolerance);
-
-  onAdsLoaderLoaded = ({ nativeEvent: event }) => {
-    console.log(`IMA >>> onAdsLoaderLoaded`, event.adLoadedData);
-  };
-
-  onAdsLoaderFailed = ({ nativeEvent: event }) => {
-    console.log(`IMA >>> onAdsLoaderFailed`, event);
-  };
-
-  onStreamManagerEvent = ({ nativeEvent: event }) => {
-    if (
-      ['RESUME', 'STREAMSTARTED', 'STREAM_LOADED', 'STARTED'].indexOf(
-        event.adEvent.type,
-      ) !== -1
-    ) {
-      console.log(`IMA >>> onStreamManagerEvent`, event.adEvent);
-    }
-  };
-
-  onStreamManagerAdProgress = ({ nativeEvent: event }) => {
-    console.log(`IMA >>> onStreamManagerAdProgress`, event);
-  };
-
-  onStreamManagerAdError = ({ nativeEvent: event }) => {
-    console.log(`IMA >>> onStreamManagerAdError`, event);
-  };
-
-  render() {
-    const {
-      playerRef,
-      imaRef,
-      contentSourceID,
-      videoID,
-      assetKey,
-      adTagParameters,
-      style,
-      ...playerProps
-    } = this.props;
-
-    return (
-      <RCTRNGoogleIMA
-        style={style}
-        contentSourceID={contentSourceID}
-        videoID={videoID}
-        assetKey={assetKey}
-        adTagParameters={adTagParameters}
-        // onAdsLoaderLoaded={this.onAdsLoaderLoaded}
-        // onAdsLoaderFailed={this.onAdsLoaderFailed}
-        // onStreamManagerEvent={this.onStreamManagerEvent}
-        // onStreamManagerAdProgress={this.onStreamManagerAdProgress}
-        // onStreamManagerAdError={this.onStreamManagerAdError}
-      >
-        <RNVideo
-          {...playerProps}
-          nativeID="RNGoogleIMAPlayer"
-          ref={this.onPlayerRef}
-          style={styles.videoPlayer}
-        />
-      </RCTRNGoogleIMA>
-    );
-  }
-}
+  return (
+    <RCTRNGoogleIMA
+      style={style}
+      contentSourceID={contentSourceID}
+      videoID={videoID}
+      assetKey={assetKey}
+      adTagParameters={adTagParameters}
+      onAdsLoaderLoaded={onAdsLoaderLoaded}
+      onAdsLoaderFailed={onAdsLoaderFailed}
+      onStreamManagerEvent={onStreamManagerEvent}
+      onStreamManagerAdProgress={onStreamManagerAdProgress}
+      onStreamManagerAdError={onStreamManagerAdError}
+    >
+      {children}
+    </RCTRNGoogleIMA>
+  );
+});
 
 RNGoogleIMA.propTypes = {
-  playerRef: PropTypes.func,
-  imaRef: PropTypes.func,
   contentSourceID: PropTypes.string,
   videoID: PropTypes.string,
   assetKey: PropTypes.string,
   adTagParameters: PropTypes.objectOf(PropTypes.string),
   style: ViewPropTypes.style,
+
+  onAdsLoaderLoaded: PropTypes.func,
+  onAdsLoaderFailed: PropTypes.func,
+  onStreamManagerEvent: PropTypes.func,
+  onStreamManagerAdProgress: PropTypes.func,
+  onStreamManagerAdError: PropTypes.func,
 };
 
 export default RNGoogleIMA;
-
-const styles = StyleSheet.create({
-  videoPlayer: {
-    flex: 1,
-  },
-});

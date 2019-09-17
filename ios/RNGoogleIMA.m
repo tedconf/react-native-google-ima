@@ -5,7 +5,7 @@
 static NSString *const statusKeyPath = @"status";
 static NSString *const rctVideoNativeID = @"RNGoogleIMAPlayer";
 
-@interface RNGoogleIMA () <IMAAdsLoaderDelegate, IMAStreamManagerDelegate, IMAAVPlayerVideoDisplayDelegate>
+@interface RNGoogleIMA () <IMAAdsLoaderDelegate, IMAStreamManagerDelegate, IMAAVPlayerVideoDisplayDelegate, IMAAdsManagerDelegate>
 
 
 @end
@@ -19,6 +19,7 @@ NSDictionary* _source;
 RCTVideo* _rctVideo;
 IMAAdsLoader* _adsLoader;
 IMAStreamManager* _streamManager;
+IMAAdsManager* _adsManager;
 IMAAVPlayerVideoDisplay* _avPlayerVideoDisplay;
 NSString* _contentSourceID;
 NSString* _videoID;
@@ -53,29 +54,38 @@ NSDictionary* _adTagParameters;
     _adTagParameters = adTagParameters != nil && adTagParameters.count > 0 ? adTagParameters : nil;
 }
 
-- (BOOL)isRCTVideo:(UIView *)view {
-    return [view.nativeID isEqualToString: rctVideoNativeID] && [view respondsToSelector:@selector(setRctVideoDelegate:)];
+- (UIView *)findRCTVideo:(UIView *)view {
+    UIView* rctVideo = nil;
+    if ([view respondsToSelector:@selector(setRctVideoDelegate:)]) {
+        rctVideo = view;
+    } else {
+        if (view.reactSubviews.count > 0) {
+            for (int i = 0; i < view.reactSubviews.count; i++) {
+                UIView* foundRCTVideo = [self findRCTVideo:[view.reactSubviews objectAtIndex:i]];
+                if (foundRCTVideo != nil) {
+                    rctVideo = foundRCTVideo;
+                    break;
+                }
+            }
+        }
+    }
+    return rctVideo;
 }
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
     [super insertReactSubview:subview atIndex:atIndex];
-    if ([self isRCTVideo:subview]) {
-        [self setupRCTVideo:(RCTVideo *)subview];
-    } else if (subview.reactSubviews.count > 0) {
-        for (int i = 0; i < subview.reactSubviews.count; i++) {
-            UIView* subsubview = [subview.reactSubviews objectAtIndex:i];
-            if ([self isRCTVideo:subsubview]) {
-                [self setupRCTVideo:(RCTVideo *)subsubview];
-            }
-        }
+    UIView* rctVideo = [self findRCTVideo:subview];
+    if (rctVideo != nil) {
+        [self setupRCTVideo:(RCTVideo *)rctVideo];
     }
 }
 
 - (void)removeReactSubview:(UIView *)subview
 {
     [super removeReactSubview:subview];
-    if ([subview.nativeID isEqualToString: rctVideoNativeID]) {
+    UIView* rctVideo = [self findRCTVideo:subview];
+    if (rctVideo != nil) {
         [self setupRCTVideo:nil];
     }
 }
@@ -98,6 +108,8 @@ NSDictionary* _adTagParameters;
         _fallbackPlayerItem = playerItem;
         _source = source;
         _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
+        [_contentPlayer setRate:0];
+        [_contentPlayer pause];
         [self requestStreamForSource: source];
         return YES;
     }
@@ -105,6 +117,13 @@ NSDictionary* _adTagParameters;
     _fallbackPlayerItem = nil;
     _source = nil;
     return NO;
+}
+
+-(void) playFallbackContent {
+    if (_fallbackPlayerItem != nil) {
+        [_contentPlayer replaceCurrentItemWithPlayerItem:_fallbackPlayerItem];
+        [_rctVideo setupPlayerItem:_fallbackPlayerItem forSource:_source withPlayer:_contentPlayer];
+    }
 }
 
 #pragma mark SDK Setup
@@ -149,10 +168,22 @@ NSDictionary* _adTagParameters;
 #pragma mark AdsLoader Delegates
 
 - (void)adsLoader:(IMAAdsLoader *)loader adsLoadedWithData:(IMAAdsLoadedData *)adsLoadedData {
+    // NSLog(@"IMA >>> adsLoader:adsLoadedWithData");
     // adsLoadedData.streamManager is set because we made an IMAStreamRequest.
-    _streamManager = adsLoadedData.streamManager;
-    _streamManager.delegate = self;
-    [_streamManager initializeWithAdsRenderingSettings:nil];
+    if (adsLoadedData.streamManager != nil) {
+        _streamManager = adsLoadedData.streamManager;
+        _streamManager.delegate = self;
+        [_streamManager initializeWithAdsRenderingSettings:nil];
+    } else {
+        _streamManager = nil;
+    }
+    if (adsLoadedData.adsManager != nil) {
+        _adsManager = adsLoadedData.adsManager;
+        _adsManager.delegate = self;
+        [_adsManager initializeWithAdsRenderingSettings:nil];
+    } else {
+        _adsManager = nil;
+    }
     if (self.onAdsLoaderLoaded) {
         self.onAdsLoaderLoaded(
                                @{
@@ -163,9 +194,9 @@ NSDictionary* _adTagParameters;
 }
 
 - (void)adsLoader:(IMAAdsLoader *)loader failedWithErrorData:(IMAAdLoadingErrorData *)adErrorData {
+    // NSLog(@"IMA >>> adsLoader:failedWithErrorData");
+    // [self playFallbackContent];
     if (self.onAdsLoaderFailed) {
-        [NSNumber numberWithLongLong:adErrorData.adError.type];
-        [NSNumber numberWithLongLong:adErrorData.adError.code];
         self.onAdsLoaderFailed(
                                @{
                                  @"adErrorData": convertAdLoadingErrorData(adErrorData),
@@ -174,14 +205,46 @@ NSDictionary* _adTagParameters;
     }
 }
 
+#pragma mark AdsManager Delegates
+
+- (void)adsManager:(IMAAdsManager *)adsManager didReceiveAdEvent:(IMAAdEvent *)event {
+    // NSLog(@"IMA >>> adsManager:didReceiveAdEvent");
+    // When the SDK notified us that ads have been loaded, play them.
+    // if (event.type == kIMAAdEvent_LOADED) {
+    //     [adsManager start];
+    // }
+}
+
+- (void)adsManager:(IMAAdsManager *)adsManager didReceiveAdError:(IMAAdError *)error {
+    // NSLog(@"IMA >>> adsManager:didReceiveAdError");
+    // Something went wrong with the ads manager after ads were loaded. Log the error and play the
+    // content.
+    // NSLog(@"AdsManager error: %@", error.message);
+    // [self.contentPlayer play];
+}
+
+- (void)adsManagerDidRequestContentPause:(IMAAdsManager *)adsManager {
+    // NSLog(@"IMA >>> adsManagerDidRequestContentPause");
+    // The SDK is going to play ads, so pause the content.
+    // [self.contentPlayer pause];
+}
+
+- (void)adsManagerDidRequestContentResume:(IMAAdsManager *)adsManager {
+    // NSLog(@"IMA >>> adsManagerDidRequestContentResume");
+    // The SDK is done playing ads (at least for now), so resume the content.
+    // [self.contentPlayer play];
+}
+
 #pragma mark StreamManager Delegates
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdEvent:(IMAAdEvent *)event {
+    // NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
             AVPlayerItem* playerItem = _contentPlayer.currentItem;
             [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:_contentPlayer];
             [_rctVideo observeValueForKeyPath:statusKeyPath ofObject:playerItem change:nil context:nil];
+            [_avPlayerVideoDisplay pause];
             break;
         }
         default:
@@ -198,6 +261,8 @@ NSDictionary* _adTagParameters;
 }
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
+    // NSLog(@"IMA >>> streamManager:didReceiveAdError");
+    [self playFallbackContent];
     if (self.onStreamManagerAdError) {
         self.onStreamManagerAdError(
                                     @{
