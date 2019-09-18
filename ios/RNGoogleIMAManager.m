@@ -22,6 +22,12 @@ RCT_EXPORT_MODULE();
 {
     return YES;
 }
+- (NSDictionary *)constantsToExport
+{
+    return @{
+        @"googleIMA": YES,
+    };
+}
 
 RCT_EXPORT_VIEW_PROPERTY(enabled, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(contentSourceID, NSString);
