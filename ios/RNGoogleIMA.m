@@ -26,6 +26,7 @@ NSString* _videoID;
 NSString* _assetKey;
 NSDictionary* _adTagParameters;
 
+
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
 {
     if ((self = [super init])) {
@@ -52,6 +53,11 @@ NSDictionary* _adTagParameters;
 - (void)setAdTagParameters:(NSDictionary *)adTagParameters
 {
     _adTagParameters = adTagParameters != nil && adTagParameters.count > 0 ? adTagParameters : nil;
+}
+
+- (void)setEnabled:(BOOL)enabled
+{
+    _enabled = enabled;
 }
 
 - (UIView *)findRCTVideo:(UIView *)view {
@@ -92,30 +98,30 @@ NSDictionary* _adTagParameters;
 
 -(void) setupRCTVideo: (RCTVideo *) rctVideo
 {
-    if (rctVideo != nil && rctVideo != _rctVideo) {
-        if (_rctVideo != nil) {
-            _rctVideo.rctVideoDelegate = nil;
-        }
+    if(_rctVideo != nil && (rctVideo == nil || rctVideo != _rctVideo)) {
+        _rctVideo.rctVideoDelegate = nil;
+    }
+    if (rctVideo) {
         _rctVideo = rctVideo;
         _rctVideo.rctVideoDelegate = self;
-    } else if(rctVideo == nil) {
-        // CLEANUP!
     }
 }
 
 -(BOOL) willSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
-    if (_contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
-        _fallbackPlayerItem = playerItem;
-        _source = source;
-        _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
-        [_contentPlayer setRate:0];
-        [_contentPlayer pause];
-        [self requestStreamForSource: source];
-        return YES;
+    if (_enabled) {
+        if (_contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
+            _fallbackPlayerItem = playerItem;
+            _source = source;
+            _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
+            [_contentPlayer setRate:0];
+            [_contentPlayer pause];
+            [self requestStreamForSource: source];
+            return YES;
+        }
+        _contentPlayer = nil;
+        _fallbackPlayerItem = nil;
+        _source = nil;
     }
-    _contentPlayer = nil;
-    _fallbackPlayerItem = nil;
-    _source = nil;
     return NO;
 }
 
@@ -187,7 +193,7 @@ NSDictionary* _adTagParameters;
     if (self.onAdsLoaderLoaded) {
         self.onAdsLoaderLoaded(
                                @{
-                                 @"adLoadedData": convertAdsLoadedData(adsLoadedData),
+                                 @"adsLoadedData": convertAdsLoadedData(adsLoadedData),
                                  @"target": self.reactTag
                                  });
     }

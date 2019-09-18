@@ -7,6 +7,7 @@ const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 const RNGoogleIMA = React.forwardRef((props, ref) => {
   const {
     children,
+    enabled = true,
     contentSourceID = null,
     videoID = null,
     assetKey = null,
@@ -27,6 +28,7 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
 
   return (
     <RCTRNGoogleIMA
+      enabled={enabled}
       style={style}
       contentSourceID={contentSourceID}
       videoID={videoID}
@@ -44,6 +46,7 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
 });
 
 RNGoogleIMA.propTypes = {
+  enabled: PropTypes.bool,
   contentSourceID: PropTypes.string,
   videoID: PropTypes.string,
   assetKey: PropTypes.string,
