@@ -25,7 +25,7 @@ RCT_EXPORT_MODULE();
 - (NSDictionary *)constantsToExport
 {
     return @{
-        @"googleIMA": YES,
+        @"googleIMA": @YES,
     };
 }
 
