@@ -29,9 +29,7 @@ NSDictionary* _adTagParameters;
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
 {
-    if ((self = [super init])) {
-        [self setupAdsLoader];
-    }
+    self = [super init];
     return self;
 }
 
@@ -83,7 +81,10 @@ NSDictionary* _adTagParameters;
     [super insertReactSubview:subview atIndex:atIndex];
     UIView* rctVideo = [self findRCTVideo:subview];
     if (rctVideo != nil) {
+        // NSLog(@"IMA >>> Found rctVideo");
         [self setupRCTVideo:(RCTVideo *)rctVideo];
+    } else {
+        // NSLog(@"IMA >>> NOT FOUND rctVideo");
     }
 }
 
@@ -96,32 +97,69 @@ NSDictionary* _adTagParameters;
     }
 }
 
+// - (void)didMoveToSuperview {
+//     [super didMoveToSuperview];
+//     [self setupAdsLoader];
+// }
+
+- (void)removeFromSuperview
+{
+    [_contentPlayer pause];
+    _contentPlayer = nil;
+
+    _fallbackPlayerItem = nil;
+    _source = nil;
+    _adDisplayContainer = nil;
+    _avPlayerVideoDisplay = nil;
+    _adsLoader = nil;
+
+    [self setupRCTVideo:nil];
+
+    [super removeFromSuperview];
+}
+
 -(void) setupRCTVideo: (RCTVideo *) rctVideo
 {
     if(_rctVideo != nil && (rctVideo == nil || rctVideo != _rctVideo)) {
         _rctVideo.rctVideoDelegate = nil;
+        _rctVideo = nil;
+        _adDisplayContainer = nil;
     }
-    if (rctVideo) {
+    if (rctVideo && rctVideo != _rctVideo) {
         _rctVideo = rctVideo;
         _rctVideo.rctVideoDelegate = self;
+        // Create an ad display container for ad rendering.
+        _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
     }
 }
 
 -(BOOL) willSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
     if (_enabled) {
-        if (_contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
+        if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
             _source = source;
+            if (_contentPlayer != nil) {
+                [_contentPlayer pause];
+                _contentPlayer = nil;
+                _avPlayerVideoDisplay = nil;
+            }
             _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
             [_contentPlayer setRate:0];
             [_contentPlayer pause];
+
+            // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
+            _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
+            // _avPlayerVideoDisplay.delegate = self;
+
             [self requestStreamForSource: source];
+            // NSLog(@"IMA >>> willSetupPlayerItem YES! uri: %@", [source objectForKey:@"uri"]);
             return YES;
         }
         _contentPlayer = nil;
         _fallbackPlayerItem = nil;
         _source = nil;
     }
+    // NSLog(@"IMA >>> willSetupPlayerItem NO!");
     return NO;
 }
 
@@ -138,17 +176,22 @@ NSDictionary* _adTagParameters;
     IMASettings* settings = [[IMASettings alloc] init];
     settings.autoPlayAdBreaks = NO;
     // settings.enableDebugMode = YES;
+    if (_adsLoader != nil) {
+        _adsLoader.delegate = nil;
+        _adsLoader = nil;
+    }
     _adsLoader = [[IMAAdsLoader alloc] initWithSettings:settings];
     _adsLoader.delegate = self;
 }
 
 - (void)requestStreamForSource:(NSDictionary *)source {
-    // Create an ad display container for ad rendering.
-    _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
-
-    // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
-    _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
-    // avPlayerVideoDisplay.delegate = self;
+    if (_streamManager != nil) {
+        // NSLog(@"IMA >>> requestStreamForSource: clear delegates");
+        IMAStreamManager* streamManager = _streamManager;
+        _streamManager = nil;
+        streamManager.delegate = nil;
+        [streamManager destroy];
+    }
 
     // Create a stream request. Use one of "Live stream request" or "VOD request".
     IMAStreamRequest *request;
@@ -168,6 +211,8 @@ NSDictionary* _adTagParameters;
     if (_adTagParameters != nil) {
         [request setAdTagParameters:_adTagParameters];
     }
+    // NSLog(@"IMA >>> requestStreamForSource: make request");
+    [self setupAdsLoader];
     [_adsLoader requestStreamWithRequest:request];
 }
 
@@ -247,10 +292,12 @@ NSDictionary* _adTagParameters;
     // NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
+
+            [_avPlayerVideoDisplay pause];
+            [_contentPlayer pause];
             AVPlayerItem* playerItem = _contentPlayer.currentItem;
             [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:_contentPlayer];
             [_rctVideo observeValueForKeyPath:statusKeyPath ofObject:playerItem change:nil context:nil];
-            [_avPlayerVideoDisplay pause];
             break;
         }
         default:
@@ -295,10 +342,10 @@ NSDictionary* _adTagParameters;
 
 // #pragma mark AVPlayerVideoDisplay Delegates
 
-// - (void)avPlayerVideoDisplay:(IMAAVPlayerVideoDisplay *)avPlayerVideoDisplay
-//          willLoadStreamAsset:(AVURLAsset *)avUrlAsset {
-//     NSLog(@"- (void)avPlayerVideoDisplay:(IMAAVPlayerVideoDisplay *)avPlayerVideoDisplay willLoadStreamAsset:(AVURLAsset *)avUrlAsset;");
+ - (void)avPlayerVideoDisplay:(IMAAVPlayerVideoDisplay *)avPlayerVideoDisplay
+          willLoadStreamAsset:(AVURLAsset *)avUrlAsset {
+     // NSLog(@"IMA >>> avPlayerVideoDisplay:willLoadStreamAsset:");
 //     [avPlayerVideoDisplay.player pause];
-// }
+ }
 
 @end
