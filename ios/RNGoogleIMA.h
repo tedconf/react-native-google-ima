@@ -9,7 +9,7 @@
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher NS_DESIGNATED_INITIALIZER;
 
-- (BOOL)willSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source;
+- (BOOL)shouldSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source;
 
 @property (nonatomic, assign) BOOL enabled;
 
