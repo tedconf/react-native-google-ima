@@ -133,7 +133,7 @@ NSDictionary* _adTagParameters;
     }
 }
 
--(BOOL) willSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
+-(BOOL) shouldSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
     if (_enabled) {
         if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
