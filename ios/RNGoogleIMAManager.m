@@ -37,8 +37,11 @@ RCT_EXPORT_VIEW_PROPERTY(adTagParameters, NSDictionary);
 
 RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderLoaded, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAdsLoaderFailed, RCTBubblingEventBlock);
-RCT_EXPORT_VIEW_PROPERTY(onStreamManagerEvent, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onStreamManagerAdEvent, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onStreamManagerAdProgress, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onStreamManagerAdError, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdsManagerAdEvent, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdsManagerAdError, RCTBubblingEventBlock);
+
 
 @end

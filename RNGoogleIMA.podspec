@@ -5,10 +5,8 @@ package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 Pod::Spec.new do |s|
   s.name         = "RNGoogleIMA"
   s.version      = package["version"]
-  s.summary      = package["description"]
-  s.description  = <<-DESC
-                  react-native-google-ima
-                   DESC
+  s.summary      = package["summary"]
+  s.description  = package["description"]
   s.homepage     = "https://github.com/tedconf/react-native-google-ima"
   s.license      = "MIT"
   # s.license    = { :type => "MIT", :file => "FILE_LICENSE" }

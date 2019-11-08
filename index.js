@@ -1,8 +1,8 @@
-import React from 'react';
-import { requireNativeComponent, ViewPropTypes } from 'react-native';
-import PropTypes from 'prop-types';
+import React from "react";
+import { requireNativeComponent, ViewPropTypes } from "react-native";
+import PropTypes from "prop-types";
 
-const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
+const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", null);
 
 const RNGoogleIMA = React.forwardRef((props, ref) => {
   const {
@@ -14,15 +14,17 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
     adTagParameters = null,
     onAdsLoaderLoaded = null,
     onAdsLoaderFailed = null,
-    onStreamManagerEvent = null,
+    onStreamManagerAdEvent = null,
     onStreamManagerAdProgress = null,
     onStreamManagerAdError = null,
-    style,
+    onAdsManagerAdEvent = null,
+    onAdsManagerAdError = null,
+    style
   } = props;
 
   React.useEffect(() => {
     if (RCTRNGoogleIMA) {
-      ref({});
+      ref({ ima: true });
     }
   }, [ref]);
 
@@ -36,9 +38,11 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
       adTagParameters={adTagParameters}
       onAdsLoaderLoaded={onAdsLoaderLoaded}
       onAdsLoaderFailed={onAdsLoaderFailed}
-      onStreamManagerEvent={onStreamManagerEvent}
+      onStreamManagerAdEvent={onStreamManagerAdEvent}
       onStreamManagerAdProgress={onStreamManagerAdProgress}
       onStreamManagerAdError={onStreamManagerAdError}
+      onAdsManagerAdEvent={onAdsManagerAdEvent}
+      onAdsManagerAdError={onAdsManagerAdError}
     >
       {children}
     </RCTRNGoogleIMA>
@@ -55,9 +59,11 @@ RNGoogleIMA.propTypes = {
 
   onAdsLoaderLoaded: PropTypes.func,
   onAdsLoaderFailed: PropTypes.func,
-  onStreamManagerEvent: PropTypes.func,
+  onStreamManagerAdEvent: PropTypes.func,
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
+  onAdsManagerAdEvent: PropTypes.func,
+  onAdsManagerAdError: PropTypes.func
 };
 
 export default RNGoogleIMA;

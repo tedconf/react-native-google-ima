@@ -264,6 +264,15 @@ NSDictionary* _adTagParameters;
     // if (event.type == kIMAAdEvent_LOADED) {
     //     [adsManager start];
     // }
+    
+    NSLog(@"IMA >>> onAdsManagerAdEvent");
+    if (self.onAdsManagerAdEvent) {
+        self.onAdsManagerAdEvent(
+                                  @{
+                                    @"adEvent": convertAdEvent(event),
+                                    @"target": self.reactTag
+                                    });
+    }
 }
 
 - (void)adsManager:(IMAAdsManager *)adsManager didReceiveAdError:(IMAAdError *)error {
@@ -272,15 +281,25 @@ NSDictionary* _adTagParameters;
     // content.
     // NSLog(@"AdsManager error: %@", error.message);
     // [self.contentPlayer play];
+    NSLog(@"IMA >>> onAdsManagerAdError");
+    if (self.onAdsManagerAdError) {
+        self.onAdsManagerAdError(
+                                    @{
+                                      @"error": convertAdError(error),
+                                      @"target": self.reactTag
+                                      });
+    }
 }
 
 - (void)adsManagerDidRequestContentPause:(IMAAdsManager *)adsManager {
+    NSLog(@"IMA >>> adsManagerDidRequestContentPause");
     // NSLog(@"IMA >>> adsManagerDidRequestContentPause");
     // The SDK is going to play ads, so pause the content.
     // [self.contentPlayer pause];
 }
 
 - (void)adsManagerDidRequestContentResume:(IMAAdsManager *)adsManager {
+    NSLog(@"IMA >>> adsManagerDidRequestContentResume");
     // NSLog(@"IMA >>> adsManagerDidRequestContentResume");
     // The SDK is done playing ads (at least for now), so resume the content.
     // [self.contentPlayer play];
@@ -289,6 +308,7 @@ NSDictionary* _adTagParameters;
 #pragma mark StreamManager Delegates
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdEvent:(IMAAdEvent *)event {
+    NSLog(@"IMA >>> onStreamManagerAdEvent");
     // NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
@@ -304,8 +324,8 @@ NSDictionary* _adTagParameters;
             break;
     }
 
-    if (self.onStreamManagerEvent) {
-        self.onStreamManagerEvent(
+    if (self.onStreamManagerAdEvent) {
+        self.onStreamManagerAdEvent(
                                   @{
                                     @"adEvent": convertAdEvent(event),
                                     @"target": self.reactTag
@@ -314,7 +334,7 @@ NSDictionary* _adTagParameters;
 }
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
-    // NSLog(@"IMA >>> streamManager:didReceiveAdError");
+    NSLog(@"IMA >>> onStreamManagerAdError");
     [self playFallbackContent];
     if (self.onStreamManagerAdError) {
         self.onStreamManagerAdError(
