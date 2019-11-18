@@ -10,9 +10,9 @@ import android.support.v7.widget.AppCompatCheckBox;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 
-public class VideoGoogleDaiManager extends SimpleViewManager<View> {
+public class VideoGoogleDAIManager extends SimpleViewManager<View> {
 
-    public static final String REACT_CLASS = "VideoGoogleDai";
+    public static final String REACT_CLASS = "VideoGoogleDAI";
 
     @Override
     public String getName() {
