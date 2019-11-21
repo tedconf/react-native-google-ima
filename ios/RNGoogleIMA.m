@@ -313,8 +313,8 @@ NSDictionary* _adTagParameters;
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
 
-            [_avPlayerVideoDisplay pause];
-            [_contentPlayer pause];
+            // [_avPlayerVideoDisplay pause];
+            // [_contentPlayer pause];
             AVPlayerItem* playerItem = _contentPlayer.currentItem;
             [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:_contentPlayer];
             [_rctVideo observeValueForKeyPath:statusKeyPath ofObject:playerItem change:nil context:nil];
