@@ -25,6 +25,7 @@ NSString* _contentSourceID;
 NSString* _videoID;
 NSString* _assetKey;
 NSDictionary* _adTagParameters;
+NSDictionary* _imaSettings;
 
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
@@ -51,6 +52,11 @@ NSDictionary* _adTagParameters;
 - (void)setAdTagParameters:(NSDictionary *)adTagParameters
 {
     _adTagParameters = adTagParameters != nil && adTagParameters.count > 0 ? adTagParameters : nil;
+}
+
+- (void)setImaSettings:(NSDictionary *)imaSettings
+{
+    _imaSettings = imaSettings != nil && imaSettings.count > 0 ? imaSettings : nil;
 }
 
 - (void)setEnabled:(BOOL)enabled
@@ -144,8 +150,8 @@ NSDictionary* _adTagParameters;
                 _avPlayerVideoDisplay = nil;
             }
             _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
-            [_contentPlayer setRate:0];
-            [_contentPlayer pause];
+            // [_contentPlayer setRate:0];
+            // [_contentPlayer pause];
 
             // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
             _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
@@ -174,7 +180,21 @@ NSDictionary* _adTagParameters;
 
 - (void)setupAdsLoader {
     IMASettings* settings = [[IMASettings alloc] init];
-    settings.autoPlayAdBreaks = NO;
+
+    if (_imaSettings != nil) {
+        if ([_imaSettings objectForKey:@"autoPlayAdBreaks"]) {
+            settings.autoPlayAdBreaks = [_imaSettings objectForKey:@"autoPlayAdBreaks"];
+        }
+        if ([_imaSettings objectForKey:@"disableNowPlayingInfo"]) {
+            settings.disableNowPlayingInfo = [_imaSettings objectForKey:@"disableNowPlayingInfo"];
+        }
+        if ([_imaSettings objectForKey:@"enableBackgroundPlayback"]) {
+            settings.enableBackgroundPlayback = [_imaSettings objectForKey:@"enableBackgroundPlayback"];
+        }
+        if ([_imaSettings objectForKey:@"enableDebugMode"]) {
+            settings.enableDebugMode = [_imaSettings objectForKey:@"enableDebugMode"];
+        }
+    }
     // settings.enableDebugMode = YES;
     if (_adsLoader != nil) {
         _adsLoader.delegate = nil;
@@ -264,7 +284,7 @@ NSDictionary* _adTagParameters;
     // if (event.type == kIMAAdEvent_LOADED) {
     //     [adsManager start];
     // }
-    
+
     NSLog(@"IMA >>> onAdsManagerAdEvent");
     if (self.onAdsManagerAdEvent) {
         self.onAdsManagerAdEvent(
@@ -308,15 +328,18 @@ NSDictionary* _adTagParameters;
 #pragma mark StreamManager Delegates
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdEvent:(IMAAdEvent *)event {
-    NSLog(@"IMA >>> onStreamManagerAdEvent");
-    // NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
+    // NSLog(@"IMA >>> onStreamManagerAdEvent");
+    NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
 
-            // [_avPlayerVideoDisplay pause];
-            // [_contentPlayer pause];
-            AVPlayerItem* playerItem = _contentPlayer.currentItem;
-            [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:_contentPlayer];
+//            [_avPlayerVideoDisplay pause];
+            [_contentPlayer pause];
+            // AVPlayer* player = _contentPlayer;
+            // AVPlayerItem* playerItem = _contentPlayer.currentItem;
+            AVPlayer* player = _avPlayerVideoDisplay.player;
+            AVPlayerItem* playerItem = _avPlayerVideoDisplay.playerItem;
+            [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:player];
             [_rctVideo observeValueForKeyPath:statusKeyPath ofObject:playerItem change:nil context:nil];
             break;
         }
@@ -364,7 +387,7 @@ NSDictionary* _adTagParameters;
 
  - (void)avPlayerVideoDisplay:(IMAAVPlayerVideoDisplay *)avPlayerVideoDisplay
           willLoadStreamAsset:(AVURLAsset *)avUrlAsset {
-     // NSLog(@"IMA >>> avPlayerVideoDisplay:willLoadStreamAsset:");
+      NSLog(@"IMA >>> avPlayerVideoDisplay:willLoadStreamAsset:");
 //     [avPlayerVideoDisplay.player pause];
  }
 

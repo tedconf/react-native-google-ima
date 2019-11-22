@@ -1,8 +1,9 @@
-import React from "react";
-import { requireNativeComponent, ViewPropTypes } from "react-native";
-import PropTypes from "prop-types";
+/* eslint-disable import/no-extraneous-dependencies */
+import React from 'react';
+import { requireNativeComponent, ViewPropTypes } from 'react-native';
+import PropTypes from 'prop-types';
 
-const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", null);
+const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 
 const RNGoogleIMA = React.forwardRef((props, ref) => {
   const {
@@ -11,6 +12,7 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
     contentSourceID = null,
     videoID = null,
     assetKey = null,
+    imaSettings = null,
     adTagParameters = null,
     onAdsLoaderLoaded = null,
     onAdsLoaderFailed = null,
@@ -19,7 +21,7 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
     onStreamManagerAdError = null,
     onAdsManagerAdEvent = null,
     onAdsManagerAdError = null,
-    style
+    style,
   } = props;
 
   React.useEffect(() => {
@@ -35,6 +37,7 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
       contentSourceID={contentSourceID}
       videoID={videoID}
       assetKey={assetKey}
+      imaSettings={imaSettings}
       adTagParameters={adTagParameters}
       onAdsLoaderLoaded={onAdsLoaderLoaded}
       onAdsLoaderFailed={onAdsLoaderFailed}
@@ -55,6 +58,7 @@ RNGoogleIMA.propTypes = {
   videoID: PropTypes.string,
   assetKey: PropTypes.string,
   adTagParameters: PropTypes.objectOf(PropTypes.string),
+  imaSettings: PropTypes.objectOf(PropTypes.bool),
   style: ViewPropTypes.style,
 
   onAdsLoaderLoaded: PropTypes.func,
@@ -63,7 +67,7 @@ RNGoogleIMA.propTypes = {
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
   onAdsManagerAdEvent: PropTypes.func,
-  onAdsManagerAdError: PropTypes.func
+  onAdsManagerAdError: PropTypes.func,
 };
 
 export default RNGoogleIMA;
