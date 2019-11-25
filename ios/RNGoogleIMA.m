@@ -110,14 +110,25 @@ NSDictionary* _imaSettings;
 
 - (void)removeFromSuperview
 {
-    [_contentPlayer pause];
-    _contentPlayer = nil;
-
+    if (_avPlayerVideoDisplay != nil) {
+        if (_avPlayerVideoDisplay.player != nil) {
+            [_avPlayerVideoDisplay.player pause];
+        }
+        _avPlayerVideoDisplay = nil;
+    }
+    if (_contentPlayer != nil) {
+        [_contentPlayer pause];
+        _contentPlayer = nil;
+    }
+    if (_adsManager != nil) {
+        [_adsManager pause];
+        [_adsManager destroy];
+        _adsManager = nil;
+    }
+    _adsLoader = nil;
     _fallbackPlayerItem = nil;
     _source = nil;
     _adDisplayContainer = nil;
-    _avPlayerVideoDisplay = nil;
-    _adsLoader = nil;
 
     [self setupRCTVideo:nil];
 
@@ -182,17 +193,17 @@ NSDictionary* _imaSettings;
     IMASettings* settings = [[IMASettings alloc] init];
 
     if (_imaSettings != nil) {
-        if ([_imaSettings objectForKey:@"autoPlayAdBreaks"]) {
-            settings.autoPlayAdBreaks = [_imaSettings objectForKey:@"autoPlayAdBreaks"];
+        if ([_imaSettings objectForKey:@"autoPlayAdBreaks"] != nil) {
+            settings.autoPlayAdBreaks = [[_imaSettings objectForKey:@"autoPlayAdBreaks"] boolValue];
         }
-        if ([_imaSettings objectForKey:@"disableNowPlayingInfo"]) {
-            settings.disableNowPlayingInfo = [_imaSettings objectForKey:@"disableNowPlayingInfo"];
+        if ([_imaSettings objectForKey:@"disableNowPlayingInfo"] != nil) {
+            settings.disableNowPlayingInfo = [[_imaSettings objectForKey:@"disableNowPlayingInfo"] boolValue];
         }
-        if ([_imaSettings objectForKey:@"enableBackgroundPlayback"]) {
-            settings.enableBackgroundPlayback = [_imaSettings objectForKey:@"enableBackgroundPlayback"];
+        if ([_imaSettings objectForKey:@"enableBackgroundPlayback"] != nil) {
+            settings.enableBackgroundPlayback = [[_imaSettings objectForKey:@"enableBackgroundPlayback"] boolValue];
         }
-        if ([_imaSettings objectForKey:@"enableDebugMode"]) {
-            settings.enableDebugMode = [_imaSettings objectForKey:@"enableDebugMode"];
+        if ([_imaSettings objectForKey:@"enableDebugMode"] != nil) {
+            settings.enableDebugMode = [[_imaSettings objectForKey:@"enableDebugMode"] boolValue];
         }
     }
     // settings.enableDebugMode = YES;
