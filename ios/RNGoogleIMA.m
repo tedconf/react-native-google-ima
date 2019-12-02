@@ -108,7 +108,7 @@ NSDictionary* _imaSettings;
 //     [self setupAdsLoader];
 // }
 
-- (void)removeFromSuperview
+- (void)playerCleanup
 {
     if (_avPlayerVideoDisplay != nil) {
         if (_avPlayerVideoDisplay.player != nil) {
@@ -120,6 +120,11 @@ NSDictionary* _imaSettings;
         [_contentPlayer pause];
         _contentPlayer = nil;
     }
+}
+
+- (void)removeFromSuperview
+{
+    [self playerCleanup];
     if (_adsManager != nil) {
         [_adsManager pause];
         [_adsManager destroy];
@@ -155,14 +160,10 @@ NSDictionary* _imaSettings;
         if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
             _source = source;
-            if (_contentPlayer != nil) {
-                [_contentPlayer pause];
-                _contentPlayer = nil;
-                _avPlayerVideoDisplay = nil;
-            }
+
+            [self playerCleanup];
+
             _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
-            // [_contentPlayer setRate:0];
-            // [_contentPlayer pause];
 
             // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
             _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
