@@ -160,14 +160,16 @@ NSDictionary* _imaSettings;
         if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
             _source = source;
+            
+            if (!_contentPlayer || !_contentPlayer)
+                [self playerCleanup];
 
-            [self playerCleanup];
+                _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
 
-            _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
-
-            // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
-            _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
-            // _avPlayerVideoDisplay.delegate = self;
+                // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
+                _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
+                // _avPlayerVideoDisplay.delegate = self;
+            }
 
             [self requestStreamForSource: source];
             // NSLog(@"IMA >>> willSetupPlayerItem YES! uri: %@", [source objectForKey:@"uri"]);
