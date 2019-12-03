@@ -178,6 +178,8 @@ NSDictionary* _imaSettings;
             [self invalidatePlayer];
 
             _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
+            [_contentPlayer pause];
+            [_contentPlayer setRate:0];
 
             _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
             // }
@@ -352,7 +354,7 @@ NSDictionary* _imaSettings;
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
 
-//            [_avPlayerVideoDisplay pause];
+            [_avPlayerVideoDisplay pause];
             [_contentPlayer pause];
             // AVPlayer* player = _contentPlayer;
             // AVPlayerItem* playerItem = _contentPlayer.currentItem;
