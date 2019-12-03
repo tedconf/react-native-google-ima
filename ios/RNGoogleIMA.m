@@ -161,7 +161,7 @@ NSDictionary* _imaSettings;
             _fallbackPlayerItem = playerItem;
             _source = source;
             
-            if (!_contentPlayer || !_contentPlayer)
+            if (!_contentPlayer || !_contentPlayer) {
                 [self playerCleanup];
 
                 _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
