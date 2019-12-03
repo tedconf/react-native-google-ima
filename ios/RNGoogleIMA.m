@@ -354,7 +354,7 @@ NSDictionary* _imaSettings;
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
 
-            [_avPlayerVideoDisplay pause];
+//            [_avPlayerVideoDisplay pause];
             [_contentPlayer pause];
             // AVPlayer* player = _contentPlayer;
             // AVPlayerItem* playerItem = _contentPlayer.currentItem;
