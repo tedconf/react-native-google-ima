@@ -88,9 +88,7 @@ NSDictionary* _imaSettings;
     UIView* rctVideo = [self findRCTVideo:subview];
     if (rctVideo != nil) {
         // NSLog(@"IMA >>> Found rctVideo");
-        [self setupRCTVideo:(RCTVideo *)rctVideo];
-    } else {
-        // NSLog(@"IMA >>> NOT FOUND rctVideo");
+        [self configure:(RCTVideo *)rctVideo];
     }
 }
 
@@ -99,59 +97,74 @@ NSDictionary* _imaSettings;
     [super removeReactSubview:subview];
     UIView* rctVideo = [self findRCTVideo:subview];
     if (rctVideo != nil) {
-        [self setupRCTVideo:nil];
+        [self configure:nil];
     }
 }
 
-// - (void)didMoveToSuperview {
-//     [super didMoveToSuperview];
-//     [self setupAdsLoader];
-// }
-
-- (void)playerCleanup
+- (void)removeFromSuperview
 {
+    NSLog(@"IMA >>> removeFromSuperview");
+
+    _adsLoader = nil;
+    _adsLoader = nil;
+    [self configure:nil];
+
+    _fallbackPlayerItem = nil;
+    _source = nil;
+
+    [super removeFromSuperview];
+}
+
+-(void) configure:(RCTVideo *) rctVideo
+{
+    [self invalidateExistingAdDisplay];
+
+    if(_rctVideo != nil && _rctVideo.rctVideoDelegate == self) {
+        _rctVideo.rctVideoDelegate = nil;
+        _rctVideo = nil;
+    }
+
+    if (rctVideo) {
+        _rctVideo = rctVideo;
+        _rctVideo.rctVideoDelegate = self;
+        // Create an ad display container for ad rendering.
+        _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
+    }
+}
+
+- (void)invalidateExistingAdDisplay
+{
+    [self invalidatePlayer];
+    
+    _adDisplayContainer = nil;
+}
+
+- (void)invalidatePlayer
+{
+    NSLog(@"IMA >>> invalidatePlayer");
+    if (_streamManager != nil) {
+        [_streamManager destroy];
+        _streamManager.delegate = nil;
+        _streamManager = nil;
+    }
     if (_avPlayerVideoDisplay != nil) {
         if (_avPlayerVideoDisplay.player != nil) {
             [_avPlayerVideoDisplay.player pause];
         }
         _avPlayerVideoDisplay = nil;
     }
-    if (_contentPlayer != nil) {
-        [_contentPlayer pause];
-        _contentPlayer = nil;
-    }
-}
-
-- (void)removeFromSuperview
-{
-    [self playerCleanup];
     if (_adsManager != nil) {
         [_adsManager pause];
         [_adsManager destroy];
         _adsManager = nil;
     }
-    _adsLoader = nil;
-    _fallbackPlayerItem = nil;
-    _source = nil;
-    _adDisplayContainer = nil;
-
-    [self setupRCTVideo:nil];
-
-    [super removeFromSuperview];
-}
-
--(void) setupRCTVideo: (RCTVideo *) rctVideo
-{
-    if(_rctVideo != nil && (rctVideo == nil || rctVideo != _rctVideo)) {
-        _rctVideo.rctVideoDelegate = nil;
-        _rctVideo = nil;
-        _adDisplayContainer = nil;
+    if (_contentPlayer != nil) {
+        [_contentPlayer pause];
+        _contentPlayer = nil;
     }
-    if (rctVideo && rctVideo != _rctVideo) {
-        _rctVideo = rctVideo;
-        _rctVideo.rctVideoDelegate = self;
-        // Create an ad display container for ad rendering.
-        _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
+    if (_adsLoader != nil) {
+        _adsLoader.delegate = nil;
+        _adsLoader = nil;
     }
 }
 
@@ -161,15 +174,13 @@ NSDictionary* _imaSettings;
             _fallbackPlayerItem = playerItem;
             _source = source;
             
-            if (!_contentPlayer || !_contentPlayer) {
-                [self playerCleanup];
+            // if (!_contentPlayer) {
+            [self invalidatePlayer];
 
-                _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
+            _contentPlayer = [AVPlayer playerWithPlayerItem:nil];
 
-                // Create an IMAAVPlayerVideoDisplay to give the SDK access to your video player.
-                _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
-                // _avPlayerVideoDisplay.delegate = self;
-            }
+            _avPlayerVideoDisplay = [[IMAAVPlayerVideoDisplay alloc] initWithAVPlayer:_contentPlayer];
+            // }
 
             [self requestStreamForSource: source];
             // NSLog(@"IMA >>> willSetupPlayerItem YES! uri: %@", [source objectForKey:@"uri"]);
@@ -192,6 +203,34 @@ NSDictionary* _imaSettings;
 
 #pragma mark SDK Setup
 
+- (void)requestStreamForSource:(NSDictionary *)source {
+    if (_streamManager != nil) {
+        _streamManager.delegate = nil;
+        [_streamManager destroy];
+        _streamManager = nil;
+    }
+
+    // Create a stream request. Use one of "Live stream request" or "VOD request".
+    IMAStreamRequest *request;
+    if (_assetKey != nil) {
+        // Live stream request.
+        request = [[IMALiveStreamRequest alloc] initWithAssetKey:_assetKey
+                                              adDisplayContainer:_adDisplayContainer
+                                                    videoDisplay:_avPlayerVideoDisplay];
+    } else {
+        request = [[IMAVODStreamRequest alloc] initWithContentSourceID:_contentSourceID
+                                                               videoID:_videoID
+                                                    adDisplayContainer:_adDisplayContainer
+                                                          videoDisplay:_avPlayerVideoDisplay];
+    }
+    
+    [request setAdTagParameters:_adTagParameters];
+
+    [self setupAdsLoader];
+
+    [_adsLoader requestStreamWithRequest:request];
+}
+
 - (void)setupAdsLoader {
     IMASettings* settings = [[IMASettings alloc] init];
 
@@ -209,45 +248,9 @@ NSDictionary* _imaSettings;
             settings.enableDebugMode = [[_imaSettings objectForKey:@"enableDebugMode"] boolValue];
         }
     }
-    // settings.enableDebugMode = YES;
-    if (_adsLoader != nil) {
-        _adsLoader.delegate = nil;
-        _adsLoader = nil;
-    }
+
     _adsLoader = [[IMAAdsLoader alloc] initWithSettings:settings];
     _adsLoader.delegate = self;
-}
-
-- (void)requestStreamForSource:(NSDictionary *)source {
-    if (_streamManager != nil) {
-        // NSLog(@"IMA >>> requestStreamForSource: clear delegates");
-        IMAStreamManager* streamManager = _streamManager;
-        _streamManager = nil;
-        streamManager.delegate = nil;
-        [streamManager destroy];
-    }
-
-    // Create a stream request. Use one of "Live stream request" or "VOD request".
-    IMAStreamRequest *request;
-    if (_assetKey != nil) {
-        // Live stream request.
-        request = [[IMALiveStreamRequest alloc] initWithAssetKey:_assetKey
-                                              adDisplayContainer:_adDisplayContainer
-                                                    videoDisplay:_avPlayerVideoDisplay];
-    } else {
-        // VOD request. Comment out the IMALiveStreamRequest above and uncomment this IMAVODStreamRequest
-        // to switch from a livestream to a VOD stream.
-        request = [[IMAVODStreamRequest alloc] initWithContentSourceID:_contentSourceID
-                                                               videoID:_videoID
-                                                    adDisplayContainer:_adDisplayContainer
-                                                          videoDisplay:_avPlayerVideoDisplay];
-    }
-    if (_adTagParameters != nil) {
-        [request setAdTagParameters:_adTagParameters];
-    }
-    // NSLog(@"IMA >>> requestStreamForSource: make request");
-    [self setupAdsLoader];
-    [_adsLoader requestStreamWithRequest:request];
 }
 
 #pragma mark AdsLoader Delegates
@@ -262,6 +265,7 @@ NSDictionary* _imaSettings;
     } else {
         _streamManager = nil;
     }
+
     if (adsLoadedData.adsManager != nil) {
         _adsManager = adsLoadedData.adsManager;
         _adsManager.delegate = self;
@@ -269,6 +273,7 @@ NSDictionary* _imaSettings;
     } else {
         _adsManager = nil;
     }
+    
     if (self.onAdsLoaderLoaded) {
         self.onAdsLoaderLoaded(
                                @{
@@ -372,7 +377,7 @@ NSDictionary* _imaSettings;
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
     NSLog(@"IMA >>> onStreamManagerAdError");
-    [self playFallbackContent];
+    // [self playFallbackContent];
     if (self.onStreamManagerAdError) {
         self.onStreamManagerAdError(
                                     @{
