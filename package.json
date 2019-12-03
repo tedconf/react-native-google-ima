@@ -1,7 +1,7 @@
 {
   "name": "react-native-google-ima",
   "title": "React Native Google IMA",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Google IMA for React Native",
   "summary": "TODO",
   "main": "index.js",
