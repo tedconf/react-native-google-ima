@@ -62,7 +62,7 @@ def configureReactNativePom(def pom) {
         name packageJson.title
         artifactId packageJson.name
         version = packageJson.version
-        group = "com.reactlibrary"
+        group = "com.reactlibrary.googleDAI"
         description packageJson.description
         url packageJson.repository.baseUrl
 
@@ -105,7 +105,7 @@ afterEvaluate { project ->
 
     android.libraryVariants.all { variant ->
         def name = variant.name.capitalize()
-        task "jar${name}"(type: Jar, dependsOn: variant.javaCompile) {
+        task "jar${name}"(type: Jar, dependsOn: variant.javaCompileProvider) {
             from variant.javaCompile.destinationDir
         }
     }

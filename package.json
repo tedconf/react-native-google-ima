@@ -1,7 +1,7 @@
 {
   "name": "react-native-google-ima",
   "title": "React Native Google IMA",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Google IMA for React Native",
   "summary": "TODO",
   "main": "index.js",
@@ -18,7 +18,7 @@
   ],
   "author": {
     "name": "Sid Ferreira",
-    "email": "sid@ted.com"
+    "email": "sidney@ted.com"
   },
   "license": "MIT",
   "licenseFilename": "LICENSE",

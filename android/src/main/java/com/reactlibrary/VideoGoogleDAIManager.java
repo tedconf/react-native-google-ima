@@ -1,9 +1,9 @@
-package com.reactlibrary;
+package com.reactlibrary.googleDAI;
 
 import android.view.View;
 
 // AppCompatCheckBox import for React Native pre-0.60:
-import android.support.v7.widget.AppCompatCheckBox;
+// import android.support.v7.widget.AppCompatCheckBox;
 // AppCompatCheckBox import for React Native 0.60(+):
 // import androidx.appcompat.widget.AppCompatCheckBox;
 
@@ -22,8 +22,6 @@ public class VideoGoogleDAIManager extends SimpleViewManager<View> {
     @Override
     public View createViewInstance(ThemedReactContext c) {
         // TODO: Implement some actually useful functionality
-        AppCompatCheckBox cb = new AppCompatCheckBox(c);
-        cb.setChecked(true);
-        return cb;
+        return new View(c);
     }
 }
