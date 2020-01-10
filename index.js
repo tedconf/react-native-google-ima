@@ -1,9 +1,8 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import React from 'react';
-import { requireNativeComponent, ViewPropTypes } from 'react-native';
-import PropTypes from 'prop-types';
+import React from "react";
+import { requireNativeComponent, ViewPropTypes, View } from "react-native";
+import PropTypes from "prop-types";
 
-const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
+const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", null);
 
 const RNGoogleIMA = React.forwardRef((props, ref) => {
   const {
@@ -21,7 +20,8 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
     onStreamManagerAdError = null,
     onAdsManagerAdEvent = null,
     onAdsManagerAdError = null,
-    style,
+    adContainerStyle = null,
+    style
   } = props;
 
   React.useEffect(() => {
@@ -47,6 +47,7 @@ const RNGoogleIMA = React.forwardRef((props, ref) => {
       onAdsManagerAdEvent={onAdsManagerAdEvent}
       onAdsManagerAdError={onAdsManagerAdError}
     >
+      <View testID="adContainerView" style={adContainerStyle} />
       {children}
     </RCTRNGoogleIMA>
   );
@@ -60,6 +61,7 @@ RNGoogleIMA.propTypes = {
   adTagParameters: PropTypes.objectOf(PropTypes.string),
   imaSettings: PropTypes.objectOf(PropTypes.bool),
   style: ViewPropTypes.style,
+  adContainerStyle: ViewPropTypes.style,
 
   onAdsLoaderLoaded: PropTypes.func,
   onAdsLoaderFailed: PropTypes.func,
@@ -67,7 +69,7 @@ RNGoogleIMA.propTypes = {
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
   onAdsManagerAdEvent: PropTypes.func,
-  onAdsManagerAdError: PropTypes.func,
+  onAdsManagerAdError: PropTypes.func
 };
 
 export default RNGoogleIMA;

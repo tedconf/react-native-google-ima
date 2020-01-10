@@ -12,6 +12,7 @@ static NSString *const rctVideoNativeID = @"RNGoogleIMAPlayer";
 
 @implementation RNGoogleIMA
 
+UIView* _adContainerView;
 IMAAdDisplayContainer* _adDisplayContainer;
 AVPlayer* _contentPlayer;
 AVPlayerItem* _fallbackPlayerItem;
@@ -85,19 +86,28 @@ NSDictionary* _imaSettings;
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
     [super insertReactSubview:subview atIndex:atIndex];
-    UIView* rctVideo = [self findRCTVideo:subview];
-    if (rctVideo != nil) {
-        // NSLog(@"IMA >>> Found rctVideo");
-        [self configure:(RCTVideo *)rctVideo];
+    if (subview.accessibilityIdentifier && [subview.accessibilityIdentifier isEqualToString:@"adContainerView"]) {
+        _adContainerView = subview;
+    } else {
+        UIView* rctVideo = [self findRCTVideo:subview];
+        if (rctVideo != nil) {
+            // NSLog(@"IMA >>> Found rctVideo");
+            [self configure:(RCTVideo *)rctVideo];
+        }
     }
+    
 }
 
 - (void)removeReactSubview:(UIView *)subview
 {
     [super removeReactSubview:subview];
-    UIView* rctVideo = [self findRCTVideo:subview];
-    if (rctVideo != nil) {
-        [self configure:nil];
+    if (subview.accessibilityIdentifier && [subview.accessibilityIdentifier isEqualToString:@"adContainerView"]) {
+        _adContainerView = nil;
+    } else {
+        UIView* rctVideo = [self findRCTVideo:subview];
+        if (rctVideo != nil) {
+            [self configure:nil];
+        }
     }
 }
 
@@ -128,7 +138,8 @@ NSDictionary* _imaSettings;
         _rctVideo = rctVideo;
         _rctVideo.rctVideoDelegate = self;
         // Create an ad display container for ad rendering.
-        _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_rctVideo companionSlots:nil];
+        _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_adContainerView companionSlots:nil];
+        
     }
 }
 
