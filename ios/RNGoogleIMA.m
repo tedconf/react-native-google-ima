@@ -65,6 +65,13 @@ NSDictionary* _imaSettings;
     _enabled = enabled;
 }
 
+- (void)setPlayFallbackContent:(BOOL)value
+{
+    [self playFallbackContent];
+}
+
+
+
 - (UIView *)findRCTVideo:(UIView *)view {
     UIView* rctVideo = nil;
     if ([view respondsToSelector:@selector(setRctVideoDelegate:)]) {
@@ -211,6 +218,7 @@ NSDictionary* _imaSettings;
     if (_fallbackPlayerItem != nil) {
         [_contentPlayer replaceCurrentItemWithPlayerItem:_fallbackPlayerItem];
         [_rctVideo setupPlayerItem:_fallbackPlayerItem forSource:_source withPlayer:_contentPlayer];
+        [_rctVideo observeValueForKeyPath:statusKeyPath ofObject:_fallbackPlayerItem change:nil context:nil];
     }
 }
 
@@ -298,7 +306,6 @@ NSDictionary* _imaSettings;
 
 - (void)adsLoader:(IMAAdsLoader *)loader failedWithErrorData:(IMAAdLoadingErrorData *)adErrorData {
     // NSLog(@"IMA >>> adsLoader:failedWithErrorData");
-    // [self playFallbackContent];
     if (self.onAdsLoaderFailed) {
         self.onAdsLoaderFailed(
                                @{
@@ -333,6 +340,7 @@ NSDictionary* _imaSettings;
     // content.
     // NSLog(@"AdsManager error: %@", error.message);
     // [self.contentPlayer play];
+    // [_contentPlayer play];
     NSLog(@"IMA >>> onAdsManagerAdError");
     if (self.onAdsManagerAdError) {
         self.onAdsManagerAdError(
@@ -365,10 +373,7 @@ NSDictionary* _imaSettings;
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
 
-//            [_avPlayerVideoDisplay pause];
             [_contentPlayer pause];
-            // AVPlayer* player = _contentPlayer;
-            // AVPlayerItem* playerItem = _contentPlayer.currentItem;
             AVPlayer* player = _avPlayerVideoDisplay.player;
             AVPlayerItem* playerItem = _avPlayerVideoDisplay.playerItem;
             [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:player];
@@ -390,7 +395,6 @@ NSDictionary* _imaSettings;
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
     NSLog(@"IMA >>> onStreamManagerAdError");
-    // [self playFallbackContent];
     if (self.onStreamManagerAdError) {
         self.onStreamManagerAdError(
                                     @{

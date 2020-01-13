@@ -1,57 +1,60 @@
-import React from "react";
-import { requireNativeComponent, ViewPropTypes, View } from "react-native";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import { requireNativeComponent, ViewPropTypes, View } from 'react-native';
+import PropTypes from 'prop-types';
 
-const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", null);
+class RNGoogleIMA extends Component {
+  _assignRoot = component => {
+    this._root = component;
+  };
 
-const RNGoogleIMA = React.forwardRef((props, ref) => {
-  const {
-    children,
-    enabled = true,
-    contentSourceID = null,
-    videoID = null,
-    assetKey = null,
-    imaSettings = null,
-    adTagParameters = null,
-    onAdsLoaderLoaded = null,
-    onAdsLoaderFailed = null,
-    onStreamManagerAdEvent = null,
-    onStreamManagerAdProgress = null,
-    onStreamManagerAdError = null,
-    onAdsManagerAdEvent = null,
-    onAdsManagerAdError = null,
-    adContainerStyle = null,
-    style
-  } = props;
+  playFallbackContent = () => {
+    this._root.setNativeProps({ playFallbackContent: true });
+  };
 
-  React.useEffect(() => {
-    if (RCTRNGoogleIMA) {
-      ref({ ima: true });
-    }
-  }, [ref]);
+  render() {
+    const {
+      children,
+      enabled = true,
+      contentSourceID = null,
+      videoID = null,
+      assetKey = null,
+      imaSettings = null,
+      adTagParameters = null,
+      onAdsLoaderLoaded = null,
+      onAdsLoaderFailed = null,
+      onStreamManagerAdEvent = null,
+      onStreamManagerAdProgress = null,
+      onStreamManagerAdError = null,
+      onAdsManagerAdEvent = null,
+      onAdsManagerAdError = null,
+      adContainerStyle = null,
+      style,
+    } = this.props;
 
-  return (
-    <RCTRNGoogleIMA
-      enabled={enabled}
-      style={style}
-      contentSourceID={contentSourceID}
-      videoID={videoID}
-      assetKey={assetKey}
-      imaSettings={imaSettings}
-      adTagParameters={adTagParameters}
-      onAdsLoaderLoaded={onAdsLoaderLoaded}
-      onAdsLoaderFailed={onAdsLoaderFailed}
-      onStreamManagerAdEvent={onStreamManagerAdEvent}
-      onStreamManagerAdProgress={onStreamManagerAdProgress}
-      onStreamManagerAdError={onStreamManagerAdError}
-      onAdsManagerAdEvent={onAdsManagerAdEvent}
-      onAdsManagerAdError={onAdsManagerAdError}
-    >
-      <View testID="adContainerView" style={adContainerStyle} />
-      {children}
-    </RCTRNGoogleIMA>
-  );
-});
+    return (
+      <RCTRNGoogleIMA
+        ref={this._assignRoot}
+        enabled={enabled}
+        style={style}
+        contentSourceID={contentSourceID}
+        videoID={videoID}
+        assetKey={assetKey}
+        imaSettings={imaSettings}
+        adTagParameters={adTagParameters}
+        onAdsLoaderLoaded={onAdsLoaderLoaded}
+        onAdsLoaderFailed={onAdsLoaderFailed}
+        onStreamManagerAdEvent={onStreamManagerAdEvent}
+        onStreamManagerAdProgress={onStreamManagerAdProgress}
+        onStreamManagerAdError={onStreamManagerAdError}
+        onAdsManagerAdEvent={onAdsManagerAdEvent}
+        onAdsManagerAdError={onAdsManagerAdError}
+      >
+        <View testID="adContainerView" style={adContainerStyle} />
+        {children}
+      </RCTRNGoogleIMA>
+    );
+  }
+}
 
 RNGoogleIMA.propTypes = {
   enabled: PropTypes.bool,
@@ -69,7 +72,15 @@ RNGoogleIMA.propTypes = {
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
   onAdsManagerAdEvent: PropTypes.func,
-  onAdsManagerAdError: PropTypes.func
+  onAdsManagerAdError: PropTypes.func,
 };
+
+// const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
+
+const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', RNGoogleIMA, {
+  nativeOnly: {
+    playFallbackContent: true,
+  },
+});
 
 export default RNGoogleIMA;
