@@ -48,8 +48,13 @@ class RNGoogleIMA extends Component {
         onStreamManagerAdError={onStreamManagerAdError}
         onAdsManagerAdEvent={onAdsManagerAdEvent}
         onAdsManagerAdError={onAdsManagerAdError}
+        pointerEvents="box-none"
       >
-        <View testID="adContainerView" style={adContainerStyle} />
+        <View
+          testID="adContainerView"
+          style={adContainerStyle}
+          pointerEvents="box-none"
+        />
         {children}
       </RCTRNGoogleIMA>
     );
