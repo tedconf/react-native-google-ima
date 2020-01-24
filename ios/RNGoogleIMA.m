@@ -70,6 +70,11 @@ NSDictionary* _imaSettings;
     [self playFallbackContent];
 }
 
+- (void)setComponentWillUnmount:(BOOL)value
+{
+    [self invalidatePlayer];
+}
+
 
 
 - (UIView *)findRCTVideo:(UIView *)view {
@@ -102,12 +107,13 @@ NSDictionary* _imaSettings;
             [self configure:(RCTVideo *)rctVideo];
         }
     }
-    
+
 }
 
 - (void)removeReactSubview:(UIView *)subview
 {
     [super removeReactSubview:subview];
+
     if (subview.accessibilityIdentifier && [subview.accessibilityIdentifier isEqualToString:@"adContainerView"]) {
         _adContainerView = nil;
     } else {
@@ -120,8 +126,6 @@ NSDictionary* _imaSettings;
 
 - (void)removeFromSuperview
 {
-    NSLog(@"IMA >>> removeFromSuperview");
-
     _adsLoader = nil;
     _adsLoader = nil;
     [self configure:nil];
@@ -146,20 +150,19 @@ NSDictionary* _imaSettings;
         _rctVideo.rctVideoDelegate = self;
         // Create an ad display container for ad rendering.
         _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_adContainerView companionSlots:nil];
-        
+
     }
 }
 
 - (void)invalidateExistingAdDisplay
 {
     [self invalidatePlayer];
-    
+
     _adDisplayContainer = nil;
 }
 
 - (void)invalidatePlayer
 {
-    NSLog(@"IMA >>> invalidatePlayer");
     if (_streamManager != nil) {
         [_streamManager destroy];
         _streamManager.delegate = nil;
@@ -191,7 +194,7 @@ NSDictionary* _imaSettings;
         if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
             _source = source;
-            
+
             // if (!_contentPlayer) {
             [self invalidatePlayer];
 
@@ -244,7 +247,7 @@ NSDictionary* _imaSettings;
                                                     adDisplayContainer:_adDisplayContainer
                                                           videoDisplay:_avPlayerVideoDisplay];
     }
-    
+
     [request setAdTagParameters:_adTagParameters];
 
     [self setupAdsLoader];
@@ -294,7 +297,7 @@ NSDictionary* _imaSettings;
     } else {
         _adsManager = nil;
     }
-    
+
     if (self.onAdsLoaderLoaded) {
         self.onAdsLoaderLoaded(
                                @{
@@ -324,7 +327,7 @@ NSDictionary* _imaSettings;
     //     [adsManager start];
     // }
 
-    NSLog(@"IMA >>> onAdsManagerAdEvent");
+    // NSLog(@"IMA >>> onAdsManagerAdEvent");
     if (self.onAdsManagerAdEvent) {
         self.onAdsManagerAdEvent(
                                   @{
@@ -341,7 +344,7 @@ NSDictionary* _imaSettings;
     // NSLog(@"AdsManager error: %@", error.message);
     // [self.contentPlayer play];
     // [_contentPlayer play];
-    NSLog(@"IMA >>> onAdsManagerAdError");
+    // NSLog(@"IMA >>> onAdsManagerAdError");
     if (self.onAdsManagerAdError) {
         self.onAdsManagerAdError(
                                     @{
@@ -352,14 +355,14 @@ NSDictionary* _imaSettings;
 }
 
 - (void)adsManagerDidRequestContentPause:(IMAAdsManager *)adsManager {
-    NSLog(@"IMA >>> adsManagerDidRequestContentPause");
+    // NSLog(@"IMA >>> adsManagerDidRequestContentPause");
     // NSLog(@"IMA >>> adsManagerDidRequestContentPause");
     // The SDK is going to play ads, so pause the content.
     // [self.contentPlayer pause];
 }
 
 - (void)adsManagerDidRequestContentResume:(IMAAdsManager *)adsManager {
-    NSLog(@"IMA >>> adsManagerDidRequestContentResume");
+    // NSLog(@"IMA >>> adsManagerDidRequestContentResume");
     // NSLog(@"IMA >>> adsManagerDidRequestContentResume");
     // The SDK is done playing ads (at least for now), so resume the content.
     // [self.contentPlayer play];
@@ -369,7 +372,7 @@ NSDictionary* _imaSettings;
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdEvent:(IMAAdEvent *)event {
     // NSLog(@"IMA >>> onStreamManagerAdEvent");
-    NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
+    // NSLog(@"IMA >>> streamManager:didReceiveAdEvent %@", event.typeString);
     switch (event.type) {
         case kIMAAdEvent_STREAM_STARTED: {
 

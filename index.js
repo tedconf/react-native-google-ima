@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { requireNativeComponent, ViewPropTypes, View } from 'react-native';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import { requireNativeComponent, ViewPropTypes, View } from "react-native";
+import PropTypes from "prop-types";
 
 class RNGoogleIMA extends Component {
   _assignRoot = component => {
@@ -10,6 +10,10 @@ class RNGoogleIMA extends Component {
   playFallbackContent = () => {
     this._root.setNativeProps({ playFallbackContent: true });
   };
+
+  componentWillUnmount() {
+    this._root.setNativeProps({ componentWillUnmount: true });
+  }
 
   render() {
     const {
@@ -28,7 +32,7 @@ class RNGoogleIMA extends Component {
       onAdsManagerAdEvent = null,
       onAdsManagerAdError = null,
       adContainerStyle = null,
-      style,
+      style
     } = this.props;
 
     return (
@@ -77,15 +81,16 @@ RNGoogleIMA.propTypes = {
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
   onAdsManagerAdEvent: PropTypes.func,
-  onAdsManagerAdError: PropTypes.func,
+  onAdsManagerAdError: PropTypes.func
 };
 
 // const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 
-const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', RNGoogleIMA, {
+const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", RNGoogleIMA, {
   nativeOnly: {
     playFallbackContent: true,
-  },
+    componentWillUnmount: true
+  }
 });
 
 export default RNGoogleIMA;
