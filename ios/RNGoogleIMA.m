@@ -377,6 +377,7 @@ NSDictionary* _imaSettings;
         case kIMAAdEvent_STREAM_STARTED: {
 
             [_contentPlayer pause];
+            [_avPlayerVideoDisplay pause];
             AVPlayer* player = _avPlayerVideoDisplay.player;
             AVPlayerItem* playerItem = _avPlayerVideoDisplay.playerItem;
             [_rctVideo setupPlayerItem:playerItem forSource:_source withPlayer:player];
