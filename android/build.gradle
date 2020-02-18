@@ -13,6 +13,8 @@ buildscript {
         classpath("com.android.tools.build:gradle:${safeExtGet('gradlePluginVersion', '3.4.1')}")
     }
 }
+// include 'react-native-video'
+// project(':react-native-video').projectDir = new File('../../react-native-video/android')
 
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
@@ -48,11 +50,21 @@ repositories {
         // https://github.com/facebook/react-native/blob/0.60-stable/template/android/build.gradle#L28
         url "$projectDir/../node_modules/react-native/android"
     }
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        // Matches recent template from React Native 0.59 / 0.60
+        // https://github.com/facebook/react-native/blob/0.59-stable/template/android/build.gradle#L30
+        // https://github.com/facebook/react-native/blob/0.60-stable/template/android/build.gradle#L28
+        url "$projectDir/../node_modules/react-native-video/android"
+    }
     mavenCentral()
 }
 
 dependencies {
     implementation "com.facebook.react:react-native:${safeExtGet('reactnativeVersion', '+')}"
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.17.0'
+    // implementation 'react-native-video'
+    implementation project(':react-native-video')
 }
 
 def configureReactNativePom(def pom) {

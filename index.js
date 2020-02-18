@@ -1,8 +1,9 @@
-import React, { Component } from "react";
-import { requireNativeComponent, ViewPropTypes, View } from "react-native";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import { requireNativeComponent, ViewPropTypes, View } from 'react-native';
+import Video from 'react-native-video';
+import PropTypes from 'prop-types';
 
-class RNGoogleIMA extends Component {
+class GoogleIMA extends Component {
   _assignRoot = component => {
     this._root = component;
   };
@@ -11,9 +12,35 @@ class RNGoogleIMA extends Component {
     this._root.setNativeProps({ playFallbackContent: true });
   };
 
+  componentDidMount() {
+    this.loadAds();
+  }
+
   componentWillUnmount() {
     this._root.setNativeProps({ componentWillUnmount: true });
   }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.source !== prevProps.source) {
+      this.loadAds();
+    }
+  }
+
+  loadAds = () => {
+    if (this.props.source) {
+      const { contentSourceID, videoID, adTagParameters } = this.props;
+      this._root.setNativeProps({
+        loadAds: {
+          contentSourceID,
+          videoID,
+          adTagParameters: {
+            cust_params: adTagParameters?.cust_params || '',
+            iu: adTagParameters?.iu || '',
+          },
+        },
+      });
+    }
+  };
 
   render() {
     const {
@@ -32,11 +59,12 @@ class RNGoogleIMA extends Component {
       onAdsManagerAdEvent = null,
       onAdsManagerAdError = null,
       adContainerStyle = null,
-      style
+      style,
+      ...playerProps
     } = this.props;
 
     return (
-      <RCTRNGoogleIMA
+      <RNGoogleIMA
         ref={this._assignRoot}
         enabled={enabled}
         style={style}
@@ -59,13 +87,13 @@ class RNGoogleIMA extends Component {
           style={adContainerStyle}
           pointerEvents="box-none"
         />
-        {children}
-      </RCTRNGoogleIMA>
+        <Video {...playerProps} source={undefined} />
+      </RNGoogleIMA>
     );
   }
 }
 
-RNGoogleIMA.propTypes = {
+GoogleIMA.propTypes = {
   enabled: PropTypes.bool,
   contentSourceID: PropTypes.string,
   videoID: PropTypes.string,
@@ -81,16 +109,17 @@ RNGoogleIMA.propTypes = {
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
   onAdsManagerAdEvent: PropTypes.func,
-  onAdsManagerAdError: PropTypes.func
+  onAdsManagerAdError: PropTypes.func,
 };
 
 // const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 
-const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", RNGoogleIMA, {
+const RNGoogleIMA = requireNativeComponent('RNGoogleIMA', GoogleIMA, {
   nativeOnly: {
     playFallbackContent: true,
-    componentWillUnmount: true
-  }
+    componentWillUnmount: true,
+    loadAds: true,
+  },
 });
 
-export default RNGoogleIMA;
+export default GoogleIMA;
