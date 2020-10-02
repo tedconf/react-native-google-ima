@@ -74,36 +74,40 @@ NSDictionary* convertAdPodInfo(IMAAdPodInfo* adPodInfo)
 
 NSDictionary* convertAd(IMAAd* ad) {
     NSDictionary* adDictionary = nil;
-    if (ad != nil) {
-        adDictionary =@{
-                        @"adId": ad.adId,
-                        @"adTitle": ad.adTitle,
-                        @"adDescription": ad.adDescription,
-                        @"adSystem": ad.adSystem,
-                        @"contentType": ad.contentType,
-                        @"duration": [NSNumber numberWithDouble:ad.duration],
-                        @"uiElements": convertArray(ad.uiElements),
-                        @"width": [NSNumber numberWithInteger:ad.width],
-                        @"height": [NSNumber numberWithInteger:ad.height],
-                        @"vastMediaWidth": [NSNumber numberWithInteger:ad.VASTMediaWidth],
-                        @"vastMediaHeight": [NSNumber numberWithInteger:ad.VASTMediaHeight],
-                        @"vastMediaBitrate": [NSNumber numberWithInteger:ad.VASTMediaBitrate],
-                        @"linear": [NSNumber numberWithBool:ad.linear],
-                        @"skippable": [NSNumber numberWithBool:ad.skippable],
-                        @"skipTimeOffset": [NSNumber numberWithDouble:ad.skipTimeOffset],
-                        @"adPodInfo": convertAdPodInfo(ad.adPodInfo),
-                        @"traffickingParameters": ad.traffickingParameters,
-                        @"creativeID": ad.creativeID,
-                        @"universalAdIdValue": ad.universalAdIdValue,
-                        @"universalAdIdRegistry": ad.universalAdIdRegistry,
-                        @"advertiserName": ad.advertiserName,
-                        @"surveyURL": orNull(ad.surveyURL),
-                        @"dealID": ad.dealID,
-                        @"wrapperAdIDs": convertArray(ad.wrapperAdIDs),
-                        @"wrapperSystems": convertArray(ad.wrapperSystems),
-                        };
+    @try {
+        if (ad != nil) {
+            adDictionary =@{
+                @"adId": orNull(ad.adId),
+                @"adTitle": orNull(ad.adTitle),
+                @"adDescription": orNull(ad.adDescription),
+                @"adSystem": orNull(ad.adSystem),
+                @"contentType": orNull(ad.contentType),
+                @"duration": [NSNumber numberWithDouble:ad.duration],
+                @"uiElements": convertArray(ad.uiElements),
+                @"width": [NSNumber numberWithInteger:ad.width],
+                @"height": [NSNumber numberWithInteger:ad.height],
+                @"vastMediaWidth": [NSNumber numberWithInteger:ad.VASTMediaWidth],
+                @"vastMediaHeight": [NSNumber numberWithInteger:ad.VASTMediaHeight],
+                @"vastMediaBitrate": [NSNumber numberWithInteger:ad.VASTMediaBitrate],
+                @"linear": [NSNumber numberWithBool:ad.linear],
+                @"skippable": [NSNumber numberWithBool:ad.skippable],
+                @"skipTimeOffset": [NSNumber numberWithDouble:ad.skipTimeOffset],
+                @"adPodInfo": orNull(convertAdPodInfo(ad.adPodInfo)),
+                @"traffickingParameters": orNull(ad.traffickingParameters),
+                @"creativeID": orNull(ad.creativeID),
+                @"universalAdIdValue": orNull(ad.universalAdIdValue),
+                @"universalAdIdRegistry": orNull(ad.universalAdIdRegistry),
+                @"advertiserName": orNull(ad.advertiserName),
+                @"surveyURL": orNull(ad.surveyURL),
+                @"dealID": orNull(ad.dealID),
+                @"wrapperAdIDs": convertArray(ad.wrapperAdIDs),
+                @"wrapperSystems": convertArray(ad.wrapperSystems),
+            };
+        }
+    } @catch (NSException *exception) {
+    } @finally {
+        return adDictionary;
     }
-    return adDictionary;
 }
 
 NSDictionary* convertAdCuepoint(IMACuepoint* cuepoint) {
