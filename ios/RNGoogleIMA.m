@@ -1,6 +1,7 @@
 #import "RNGoogleIMA.h"
 #import "RNGoogleIMAConverters.m"
 #import "UIView+React.h"
+#import "RNGoogleIMAManager.h"
 
 static NSString *const statusKeyPath = @"status";
 static NSString *const rctVideoNativeID = @"RNGoogleIMAPlayer";
@@ -32,6 +33,7 @@ NSDictionary* _imaSettings;
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
 {
     self = [super init];
+    RCTVideo.rctVideoDelegate = self;
     return self;
 }
 
@@ -75,8 +77,6 @@ NSDictionary* _imaSettings;
     [self invalidatePlayer];
 }
 
-
-
 - (UIView *)findRCTVideo:(UIView *)view {
     UIView* rctVideo = nil;
     if ([view respondsToSelector:@selector(setRctVideoDelegate:)]) {
@@ -100,12 +100,12 @@ NSDictionary* _imaSettings;
     [super insertReactSubview:subview atIndex:atIndex];
     if (subview.accessibilityIdentifier && [subview.accessibilityIdentifier isEqualToString:@"adContainerView"]) {
         _adContainerView = subview;
-    } else {
-        UIView* rctVideo = [self findRCTVideo:subview];
-        if (rctVideo != nil) {
-            // NSLog(@"IMA >>> Found rctVideo");
-            [self configure:(RCTVideo *)rctVideo];
-        }
+    // } else {
+    //     UIView* rctVideo = [self findRCTVideo:subview];
+    //     if (rctVideo != nil) {
+    //         // NSLog(@"IMA >>> Found rctVideo");
+    //         [self configure:(RCTVideo *)rctVideo];
+    //     }
     }
 
 }
@@ -141,13 +141,13 @@ NSDictionary* _imaSettings;
     [self invalidateExistingAdDisplay];
 
     if(_rctVideo != nil && _rctVideo.rctVideoDelegate == self) {
-        _rctVideo.rctVideoDelegate = nil;
+        // _rctVideo.rctVideoDelegate = nil;
         _rctVideo = nil;
     }
 
     if (rctVideo) {
         _rctVideo = rctVideo;
-        _rctVideo.rctVideoDelegate = self;
+        // _rctVideo.rctVideoDelegate = self;
         // Create an ad display container for ad rendering.
         _adDisplayContainer = [[IMAAdDisplayContainer alloc] initWithAdContainer:_adContainerView companionSlots:nil];
 
@@ -189,9 +189,10 @@ NSDictionary* _imaSettings;
     }
 }
 
--(BOOL) shouldSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
+-(BOOL) shouldSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source forInstance:(RCTVideo *)rctVideo {
     if (_enabled) {
-        if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
+        [self configure:rctVideo];
+        if (_contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
             _source = source;
 
