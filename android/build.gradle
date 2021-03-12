@@ -29,6 +29,10 @@ android {
 dependencies {
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
-
     implementation "com.google.ads.interactivemedia.v3:interactivemedia:${safeExtGet('googleImaVersion', "3.22.2")}"
+
+    implementation project(path: ':react-native-video')
+    implementation("com.google.android.exoplayer:exoplayer:${safeExtGet('exoplayerVersion', '2.11.4')}") {
+        exclude group: 'com.android.support'
+    }
 }
