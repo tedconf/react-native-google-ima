@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
 import android.view.View;
+import android.os.Build;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 

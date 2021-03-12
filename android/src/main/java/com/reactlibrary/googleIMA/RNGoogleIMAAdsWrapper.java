@@ -60,7 +60,7 @@ public class RNGoogleIMAAdsWrapper
     private StreamManager streamManager;
     private final List<VideoStreamPlayer.VideoStreamPlayerCallback> playerCallbacks;
 
-    private final com.ted.android.dai.RNGoogleIMAVideoWrapper videoPlayer;
+    private final RNGoogleIMAVideoWrapper videoPlayer;
     private final Context context;
     private final ViewGroup adUiContainer;
 
@@ -76,7 +76,7 @@ public class RNGoogleIMAAdsWrapper
      */
     public RNGoogleIMAAdsWrapper(
             Context context,
-            com.ted.android.dai.RNGoogleIMAVideoWrapper videoPlayer,
+            RNGoogleIMAVideoWrapper videoPlayer,
             ViewGroup adUiContainer) {
         this.videoPlayer = videoPlayer;
         this.context = context;
@@ -102,7 +102,7 @@ public class RNGoogleIMAAdsWrapper
         displayContainer =
                 ImaSdkFactory.createStreamDisplayContainer(adUiContainer, videoStreamPlayer);
         videoPlayer.setSampleVideoPlayerCallback(
-                new com.ted.android.dai.RNGoogleIMAVideoWrapper.SampleVideoPlayerCallback() {
+                new RNGoogleIMAVideoWrapper.SampleVideoPlayerCallback() {
                     @Override
                     public void onUserTextReceived(String userText) {
                         for (VideoStreamPlayer.VideoStreamPlayerCallback callback : playerCallbacks) {

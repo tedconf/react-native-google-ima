@@ -10,7 +10,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 import javax.annotation.Nullable;
 
-public class RNGoogleIMAManager extends ViewGroupManager<com.ted.android.dai.RNGoogleIMAView> {
+public class RNGoogleIMAManager extends ViewGroupManager<RNGoogleIMAView> {
 
     private static final String REACT_CLASS = "RNGoogleIMA";
 
@@ -30,27 +30,27 @@ public class RNGoogleIMAManager extends ViewGroupManager<com.ted.android.dai.RNG
 
     @NonNull
     @Override
-    protected com.ted.android.dai.RNGoogleIMAView createViewInstance(@NonNull ThemedReactContext reactContext) {
-        return new com.ted.android.dai.RNGoogleIMAView(reactContext);
+    protected RNGoogleIMAView createViewInstance(@NonNull ThemedReactContext reactContext) {
+        return new RNGoogleIMAView(reactContext);
     }
 
     @ReactProp(name = "contentSourceID")
-    public void setContentSourceID(com.ted.android.dai.RNGoogleIMAView view, @Nullable String contentSourceID) {
+    public void setContentSourceID(RNGoogleIMAView view, @Nullable String contentSourceID) {
         view.setContentSourceID(contentSourceID != null ? contentSourceID : "");
     }
 
     @ReactProp(name = "videoID")
-    public void setVideoID(com.ted.android.dai.RNGoogleIMAView view, @Nullable String videoID) {
+    public void setVideoID(RNGoogleIMAView view, @Nullable String videoID) {
         view.setVideoID(videoID != null ? videoID : "");
     }
 
     @ReactProp(name = "assetKey")
-    public void setAssetKey(com.ted.android.dai.RNGoogleIMAView view, @Nullable String assetKey) {
+    public void setAssetKey(RNGoogleIMAView view, @Nullable String assetKey) {
         view.setAssetKey(assetKey != null ? assetKey : "");
     }
 
     @ReactProp(name = "adTagParameters")
-    public void setAdTagParameters(com.ted.android.dai.RNGoogleIMAView view, @Nullable ReadableMap adTagParameters) {
+    public void setAdTagParameters(RNGoogleIMAView view, @Nullable ReadableMap adTagParameters) {
         view.setAdTagParameters(adTagParameters);
     }
 }

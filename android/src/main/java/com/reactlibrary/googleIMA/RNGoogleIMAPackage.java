@@ -20,6 +20,6 @@ public class RNGoogleIMAPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Collections.singletonList(new com.ted.android.dai.RNGoogleIMAManager(reactContext));
+        return Collections.singletonList(new RNGoogleIMAManager(reactContext));
     }
 }

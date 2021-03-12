@@ -19,8 +19,8 @@ public class RNGoogleIMAVideoWrapper {
         this.reactExoplayerView = reactExoplayerView;
     }
 
-    public static com.ted.android.dai.RNGoogleIMAVideoWrapper fromReactExoplayerView(ReactExoplayerView reactExoplayerView) {
-        return new com.ted.android.dai.RNGoogleIMAVideoWrapper(reactExoplayerView);
+    public static RNGoogleIMAVideoWrapper fromReactExoplayerView(ReactExoplayerView reactExoplayerView) {
+        return new RNGoogleIMAVideoWrapper(reactExoplayerView);
     }
 
     public void setFallbackUri(Uri uri) {
@@ -56,7 +56,7 @@ public class RNGoogleIMAVideoWrapper {
 //        reactExoplayerView.setPausedModifier();
     }
 
-    public void setDelegate(com.ted.android.dai.RNGoogleIMAView rnGoogleIMAView) {
+    public void setDelegate(RNGoogleIMAView rnGoogleIMAView) {
         reactExoplayerView.delegate = rnGoogleIMAView;
     }
 
