@@ -1,16 +1,18 @@
-package com.reactlibrary.googleDAI;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+package com.reactlibrary.googleIMA;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
-import com.facebook.react.bridge.JavaScriptModule;
 
-public class VideoGoogleDAIPackage implements ReactPackage {
+import java.util.Collections;
+import java.util.List;
+
+public class RNGoogleIMAPackage implements ReactPackage {
+
+    public RNGoogleIMAPackage() {
+    }
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Collections.emptyList();
@@ -18,6 +20,6 @@ public class VideoGoogleDAIPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Arrays.<ViewManager>asList(new VideoGoogleDAIManager());
+        return Collections.singletonList(new com.ted.android.dai.RNGoogleIMAManager(reactContext));
     }
 }

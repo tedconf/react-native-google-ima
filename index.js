@@ -3,7 +3,7 @@ import { requireNativeComponent, ViewPropTypes, View } from "react-native";
 import PropTypes from "prop-types";
 
 class RNGoogleIMA extends Component {
-  _assignRoot = component => {
+  _assignRoot = (component) => {
     this._root = component;
   };
 
@@ -32,7 +32,7 @@ class RNGoogleIMA extends Component {
       onAdsManagerAdEvent = null,
       onAdsManagerAdError = null,
       adContainerStyle = null,
-      style
+      style,
     } = this.props;
 
     return (
@@ -56,6 +56,7 @@ class RNGoogleIMA extends Component {
       >
         <View
           testID="adContainerView"
+          nativeID="adContainerView"
           style={adContainerStyle}
           pointerEvents="box-none"
         />
@@ -81,7 +82,7 @@ RNGoogleIMA.propTypes = {
   onStreamManagerAdProgress: PropTypes.func,
   onStreamManagerAdError: PropTypes.func,
   onAdsManagerAdEvent: PropTypes.func,
-  onAdsManagerAdError: PropTypes.func
+  onAdsManagerAdError: PropTypes.func,
 };
 
 // const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
@@ -89,8 +90,8 @@ RNGoogleIMA.propTypes = {
 const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", RNGoogleIMA, {
   nativeOnly: {
     playFallbackContent: true,
-    componentWillUnmount: true
-  }
+    componentWillUnmount: true,
+  },
 });
 
 export default RNGoogleIMA;
