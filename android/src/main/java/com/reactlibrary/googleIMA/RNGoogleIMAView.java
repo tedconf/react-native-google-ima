@@ -13,9 +13,11 @@ import androidx.annotation.NonNull;
 
 import com.brentvatne.exoplayer.ReactExoplayerView;
 import com.brentvatne.exoplayer.ReactExoplayerViewDelegateInterface;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableNativeMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import com.facebook.react.views.view.ReactViewGroup;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
@@ -39,11 +41,12 @@ import java.util.Map;
 
 @SuppressLint("ViewConstructor")
 public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerViewDelegateInterface,
-        AdEvent.AdEventListener, AdErrorEvent.AdErrorListener, AdsLoader.AdsLoadedListener {
+        StreamManagerEventBridgeDelegate, AdsLoaderEventBridgeDelegate {
 
     private static final String TAG = "ReactExoplayerView";
 
-    private boolean willSetSource = false;
+    private boolean shouldSetupPlayer = false;
+    private boolean playingFeedbackContent = false;
 
     private ImaSdkFactory sdkFactory;
     private List<VideoStreamPlayer.VideoStreamPlayerCallback> playerCallbacks;
@@ -63,9 +66,14 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     HashMap<String, String> adTagParameters;
     ReadableNativeMap _imaSettings;
 
+    StreamManagerEventBridge streamManagerEventBridge;
+    AdsLoaderEventBridge adsLoaderEventBridge;
+
 
     public RNGoogleIMAView(@NonNull Context context) {
         super(context);
+        streamManagerEventBridge = new StreamManagerEventBridge(this);
+        adsLoaderEventBridge = new AdsLoaderEventBridge(this);
         initialize();
     }
 
@@ -82,6 +90,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     public void setVideoID(String videoID)
     {
         this.videoID = videoID;
+        playingFeedbackContent = false;
     }
 
     public void setAssetKey(String assetKey)
@@ -100,6 +109,22 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         }
     }
 
+    public void setImaSettings(ReadableMap imaSettings) {
+
+    }
+
+    public void setPlayFallbackContent() {
+        if (videoPlayer != null) {
+            this.playingFeedbackContent = true;
+            videoPlayer.playFallback();
+        }
+
+    }
+
+    public void setComponentWillUnmount(boolean componentWillUnmount) {
+
+    }
+
     @Override
     public void addView(View child, int index, LayoutParams params) {
         super.addView(child, index, params);
@@ -113,7 +138,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
 
     @Override
     public MediaSource buildMediaSource(ReactExoplayerView reactExoplayerView, Uri uri, String overrideExtension) {
-        if (subDelegate != null && !willSetSource) {
+        if (subDelegate != null && !shouldSetupPlayer) {
             return subDelegate.buildMediaSource(reactExoplayerView, uri, overrideExtension);
         }
         return null;
@@ -121,13 +146,16 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
 
     @Override
     public boolean setSrc(ReactExoplayerView reactExoplayerView, Uri uri, String extension, Map<String, String> headers) {
-        if (videoPlayer != null) {
-            videoPlayer.setFallbackUri(uri);
-            videoPlayer.setFallbackExtension(extension);
-            videoPlayer.setFallbackHeaders(headers);
+        shouldSetupPlayer = false;
+        if (isEnabled()) {
+            if (videoPlayer != null) {
+                videoPlayer.setFallbackUri(uri);
+                videoPlayer.setFallbackExtension(extension);
+                videoPlayer.setFallbackHeaders(headers);
+            }
         }
-        willSetSource = requestAndPlayAds();
-        return willSetSource;
+        shouldSetupPlayer = requestStream();
+        return shouldSetupPlayer;
     }
 
     private void invalidateExistingAdDisplay() {
@@ -138,8 +166,27 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
 
 
     void invalidatePlayer() {
-        streamManager = null;
-        adsLoader = null;
+        invalidateStreamManager();
+        invalidateAdsLoader();
+    }
+
+    void invalidateStreamManager() {
+        if (streamManager != null) {
+            StreamManager sm = streamManager;
+            streamManager = null;
+            sm.removeAdErrorListener(streamManagerEventBridge);
+            sm.removeAdEventListener(streamManagerEventBridge);
+            sm.destroy();
+        }
+    }
+
+    void invalidateAdsLoader() {
+        if (adsLoader != null) {
+            AdsLoader al = adsLoader;
+            adsLoader = null;
+            al.removeAdErrorListener(adsLoaderEventBridge);
+            al.removeAdsLoadedListener(adsLoaderEventBridge);
+        }
     }
 
     private void initializeVideo(RNGoogleIMAVideoWrapper videoPlayer) {
@@ -154,11 +201,10 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
             this.videoPlayer = videoPlayer;
             this.videoPlayer.setDelegate(this);
             // Create an ad display container for ad rendering.
-            createAdsLoader();
         }
     }
 
-    private void createAdsLoader() {
+    private void setupAdsLoader() {
         enableWebViewDebugging();
         VideoStreamPlayer videoStreamPlayer = createVideoStreamPlayer();
         if (adContainerView == null) {
@@ -201,7 +247,6 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         void log(String logMessage);
     }
 
-    private String fallbackUrl;
     private RNGoogleIMAAdsWrapper.Logger logger;
 
     @TargetApi(19)
@@ -211,17 +256,21 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         }
     }
 
-    public boolean requestAndPlayAds() {
-        if (videoPlayer == null || adsLoader == null) {
+    public boolean requestStream() {
+        if (videoPlayer == null) {
             return false;
         }
         StreamRequest request = buildStreamRequest();
         if (request == null) {
             return false;
         }
+        invalidatePlayer();
         request.setAdTagParameters(adTagParameters);
-        adsLoader.addAdErrorListener(this);
-        adsLoader.addAdsLoadedListener(this);
+
+        setupAdsLoader();
+
+        adsLoader.addAdErrorListener(adsLoaderEventBridge);
+        adsLoader.addAdsLoadedListener(adsLoaderEventBridge);
         adsLoader.requestStream(request);
         return true;
     }
@@ -247,8 +296,10 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         return new VideoStreamPlayer() {
             @Override
             public void loadUrl(String url, List<HashMap<String, String>> subtitles) {
-                videoPlayer.setStreamUrl(url);
-                videoPlayer.play();
+                if (!playingFeedbackContent) {
+                    videoPlayer.setStreamUrl(url);
+                    videoPlayer.play();
+                }
             }
 
             @Override
@@ -320,41 +371,29 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         };
     }
 
-    /** AdErrorListener implementation */
-    @Override
-    public void onAdError(AdErrorEvent event) {
-        log(String.format("Error: %s\n", event.getError().getMessage()));
-        // play fallback URL.
-        log("Playing fallback Url\n");
-
-        videoPlayer.playFallback();
+    /** StreamManager Events */
+    public void onStreamManagerAdError(AdErrorEvent adErrorEvent) {
+        sendEvent("onStreamManagerAdError", RNGoogleIMAConverters.convertAdErrorEvent(adErrorEvent));
+    }
+    public void onStreamManagerAdEvent(AdEvent adEvent) {
+        // TODO: bubble
+        sendEvent("onStreamManagerAdEvent", RNGoogleIMAConverters.convertAdEvent(adEvent));
     }
 
-    /** AdEventListener implementation */
-    @Override
-    public void onAdEvent(AdEvent event) {
-        switch (event.getType()) {
-            case AD_PROGRESS:
-                // Do nothing or else log will be filled by these messages.
-                break;
-            default:
-                log(String.format("Event: %s\n", event.getType()));
-                break;
-        }
-    }
-
-    /** AdsLoadedListener implementation */
-    @Override
-    public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
-        streamManager = event.getStreamManager();
-        streamManager.addAdErrorListener(this);
-        streamManager.addAdEventListener(this);
+    /** AdsLoader Events */
+    public void onAdsLoaderAdsLoadedWithData(AdsManagerLoadedEvent adsLoadedDataEvent) {
+        invalidateStreamManager();
+        streamManager = adsLoadedDataEvent.getStreamManager();
+        streamManager.addAdErrorListener(streamManagerEventBridge);
+        streamManager.addAdEventListener(streamManagerEventBridge);
         streamManager.init();
+
+        sendEvent("onAdsLoaderLoaded", RNGoogleIMAConverters.convertAdsLoadedData(adsLoadedDataEvent));
     }
 
-    /** Sets fallback URL in case ads stream fails. */
-    void setFallbackUrl(String url) {
-        fallbackUrl = url;
+    public void onAdsLoaderAdError(AdErrorEvent adErrorEvent) {
+        // TODO: bubble
+        sendEvent("onAdsLoaderFailed", RNGoogleIMAConverters.convertAdErrorEvent(adErrorEvent));
     }
 
     /** Sets logger for displaying events to screen. Optional. */
@@ -366,5 +405,64 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         if (logger != null) {
             logger.log(message);
         }
+    }
+    public boolean sendEvent(String eventName, ReadableMap eventData) {
+
+        // Fill in eventData; details not important
+
+        ReactContext reactContext = (ReactContext) getContext();
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, eventData);
+
+        return true;
+    }
+}
+
+interface StreamManagerEventBridgeDelegate {
+    void onStreamManagerAdError(AdErrorEvent adErrorEvent);
+    void onStreamManagerAdEvent(AdEvent adEvent);
+}
+
+class StreamManagerEventBridge implements AdErrorEvent.AdErrorListener, AdEvent.AdEventListener {
+
+    final StreamManagerEventBridgeDelegate delegate;
+
+    StreamManagerEventBridge(StreamManagerEventBridgeDelegate delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public void onAdError(AdErrorEvent adErrorEvent) {
+        delegate.onStreamManagerAdError(adErrorEvent);
+    }
+
+    @Override
+    public void onAdEvent(AdEvent adEvent) {
+        delegate.onStreamManagerAdEvent(adEvent);
+    }
+}
+
+
+interface AdsLoaderEventBridgeDelegate {
+    void onAdsLoaderAdError(AdErrorEvent adErrorEvent);
+    void onAdsLoaderAdsLoadedWithData(AdsManagerLoadedEvent adsManagerLoadedEvent);
+}
+
+class AdsLoaderEventBridge implements AdErrorEvent.AdErrorListener, AdsLoader.AdsLoadedListener {
+
+    final AdsLoaderEventBridgeDelegate delegate;
+
+    AdsLoaderEventBridge(AdsLoaderEventBridgeDelegate delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public void onAdError(AdErrorEvent adErrorEvent) {
+        delegate.onAdsLoaderAdError(adErrorEvent);
+    }
+
+    @Override
+    public void onAdsManagerLoaded(AdsManagerLoadedEvent adsManagerLoadedEvent) {
+        delegate.onAdsLoaderAdsLoadedWithData(adsManagerLoadedEvent);
     }
 }
