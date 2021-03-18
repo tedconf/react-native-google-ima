@@ -1,5 +1,6 @@
 package com.reactlibrary.googleIMA;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -19,16 +20,19 @@ import java.util.Map;
 public class RNGoogleIMAConverters {
     static WritableMap convertAdsLoadedData(AdsManagerLoadedEvent adsLoadedData)
     {
-        WritableNativeMap data = new WritableNativeMap();
+        WritableMap data = Arguments.createMap();
         data.putMap("adsManager", convertAdsManager(adsLoadedData.getAdsManager()));
         data.putMap("streamManager", convertStreamManager(adsLoadedData.getStreamManager()));
         WritableNativeMap adsLoadedDataDictionary = new WritableNativeMap();
         adsLoadedDataDictionary.putMap("adsLoadedData", data);
-        return data;
+        return adsLoadedDataDictionary;
     }
 
     static WritableMap convertAdsManager(AdsManager adsManager) {
-        WritableNativeMap data = new WritableNativeMap();
+        if (adsManager == null) {
+            return null;
+        }
+        WritableMap data = Arguments.createMap();
 
         data.putArray("adCuePoints", convertArray(adsManager.getAdCuePoints().toArray(new Float[0])));
 
@@ -43,7 +47,7 @@ public class RNGoogleIMAConverters {
     }
 
     static WritableMap convertStreamManager(StreamManager streamManager) {
-        WritableNativeMap data = new WritableNativeMap();
+        WritableMap data = Arguments.createMap();
 
         data.putString("streamId", streamManager.getStreamId());
 
@@ -51,18 +55,18 @@ public class RNGoogleIMAConverters {
     }
 
     static WritableArray convertArray(Object[] items) {
-        WritableNativeArray writableNativeArray = new WritableNativeArray();
+        WritableArray writableArray = Arguments.createArray();
         for (Object item : items) {
             if (item.getClass().equals(String.class)) {
-                writableNativeArray.pushString((String) item);
+                writableArray.pushString((String) item);
             } else if (item.getClass().equals(String.class)) {
-                writableNativeArray.pushString((String) item);
+                writableArray.pushString((String) item);
             } else if (item.getClass().equals(UiElement.class)) {
-                writableNativeArray.pushString(((UiElement) item).getName());
+                writableArray.pushString(((UiElement) item).getName());
             }
 
         }
-        return writableNativeArray;
+        return writableArray;
     }
 
     public static WritableMap convertAdEvent(AdEvent adEvent) {
@@ -178,7 +182,7 @@ public class RNGoogleIMAConverters {
 
     public static WritableMap convertAdData(Map<String, String> adData) {
         if (adData != null) {
-            WritableNativeMap adDataDictionary = new WritableNativeMap();
+            WritableMap adDataDictionary = Arguments.createMap();
             String[] keys = (String[]) adData.keySet().toArray();
             for (String key : keys) {
                 if (key.equals("cuepoints")) {
@@ -208,7 +212,7 @@ public class RNGoogleIMAConverters {
     }
 
     public static WritableMap convertAd(Ad ad) {
-        WritableNativeMap adDictionary = new WritableNativeMap();
+        WritableMap adDictionary = Arguments.createMap();
         try {
             if (ad != null) {
                 adDictionary.putString("adId", ad.getAdId());
@@ -257,7 +261,7 @@ public class RNGoogleIMAConverters {
     }
 
     public static WritableMap convertAdErrorEvent(AdErrorEvent adErrorEvent) {
-        WritableNativeMap adPodInfoDictionary = new WritableNativeMap();
+        WritableMap adPodInfoDictionary = Arguments.createMap();
         if (adErrorEvent != null) {
             AdError adError = adErrorEvent.getError();
             if (adError != null) {

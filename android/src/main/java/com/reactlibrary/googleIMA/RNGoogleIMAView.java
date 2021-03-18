@@ -80,21 +80,20 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     private void initialize() {
         sdkFactory = ImaSdkFactory.getInstance();
         playerCallbacks = new ArrayList<>();
-    };
+    }
 
-    public void setContentSourceID(String contentSourceID)
-    {
+    ;
+
+    public void setContentSourceID(String contentSourceID) {
         this.contentSourceID = contentSourceID;
     }
 
-    public void setVideoID(String videoID)
-    {
+    public void setVideoID(String videoID) {
         this.videoID = videoID;
         playingFeedbackContent = false;
     }
 
-    public void setAssetKey(String assetKey)
-    {
+    public void setAssetKey(String assetKey) {
         this.assetKey = assetKey;
     }
 
@@ -102,7 +101,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         this.adTagParameters = new HashMap<>();
         if (adTagParameters != null) {
             ReadableMapKeySetIterator iterator = adTagParameters.keySetIterator();
-            while(iterator.hasNextKey()) {
+            while (iterator.hasNextKey()) {
                 String key = iterator.nextKey();
                 this.adTagParameters.put(key, adTagParameters.getString(key));
             }
@@ -131,8 +130,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         ReactExoplayerView reactExoplayerView = ReactExoplayerView.findRCTVideo(child);
         if (reactExoplayerView != null) {
             reactExoplayerView.setDelegate(this);
-            videoPlayer = new RNGoogleIMAVideoWrapper(reactExoplayerView);
-            initializeVideo(videoPlayer);
+            initializeVideo(new RNGoogleIMAVideoWrapper(reactExoplayerView));
         }
     }
 
@@ -192,15 +190,14 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     private void initializeVideo(RNGoogleIMAVideoWrapper videoPlayer) {
         this.invalidateExistingAdDisplay();
 
-        if(this.videoPlayer != null) {
+        if (this.videoPlayer != null && this.videoPlayer != videoPlayer) {
             this.videoPlayer.setDelegate(null);
             this.videoPlayer = null;
         }
 
-        if (videoPlayer != null) {
+        if (videoPlayer != null && this.videoPlayer != videoPlayer) {
             this.videoPlayer = videoPlayer;
             this.videoPlayer.setDelegate(this);
-            // Create an ad display container for ad rendering.
         }
     }
 
@@ -242,11 +239,6 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         adsLoader = sdkFactory.createAdsLoader(getContext(), settings, adDisplayContainer);
     }
 
-    /** Log interface, so we can output the log commands to the UI or similar. */
-    public interface Logger {
-        void log(String logMessage);
-    }
-
     private RNGoogleIMAAdsWrapper.Logger logger;
 
     @TargetApi(19)
@@ -260,18 +252,18 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         if (videoPlayer == null) {
             return false;
         }
-        StreamRequest request = buildStreamRequest();
-        if (request == null) {
+        StreamRequest streamRequest = buildStreamRequest();
+        if (streamRequest == null) {
             return false;
         }
         invalidatePlayer();
-        request.setAdTagParameters(adTagParameters);
+        streamRequest.setAdTagParameters(adTagParameters);
 
         setupAdsLoader();
 
         adsLoader.addAdErrorListener(adsLoaderEventBridge);
         adsLoader.addAdsLoadedListener(adsLoaderEventBridge);
-        adsLoader.requestStream(request);
+        adsLoader.requestStream(streamRequest);
         return true;
     }
 
@@ -371,16 +363,21 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         };
     }
 
-    /** StreamManager Events */
+    /**
+     * StreamManager Events
+     */
     public void onStreamManagerAdError(AdErrorEvent adErrorEvent) {
         sendEvent("onStreamManagerAdError", RNGoogleIMAConverters.convertAdErrorEvent(adErrorEvent));
     }
+
     public void onStreamManagerAdEvent(AdEvent adEvent) {
         // TODO: bubble
         sendEvent("onStreamManagerAdEvent", RNGoogleIMAConverters.convertAdEvent(adEvent));
     }
 
-    /** AdsLoader Events */
+    /**
+     * AdsLoader Events
+     */
     public void onAdsLoaderAdsLoadedWithData(AdsManagerLoadedEvent adsLoadedDataEvent) {
         invalidateStreamManager();
         streamManager = adsLoadedDataEvent.getStreamManager();
@@ -396,7 +393,9 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         sendEvent("onAdsLoaderFailed", RNGoogleIMAConverters.convertAdErrorEvent(adErrorEvent));
     }
 
-    /** Sets logger for displaying events to screen. Optional. */
+    /**
+     * Sets logger for displaying events to screen. Optional.
+     */
     void setLogger(RNGoogleIMAAdsWrapper.Logger logger) {
         this.logger = logger;
     }
@@ -406,6 +405,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
             logger.log(message);
         }
     }
+
     public boolean sendEvent(String eventName, ReadableMap eventData) {
 
         // Fill in eventData; details not important
@@ -420,6 +420,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
 
 interface StreamManagerEventBridgeDelegate {
     void onStreamManagerAdError(AdErrorEvent adErrorEvent);
+
     void onStreamManagerAdEvent(AdEvent adEvent);
 }
 
@@ -445,6 +446,7 @@ class StreamManagerEventBridge implements AdErrorEvent.AdErrorListener, AdEvent.
 
 interface AdsLoaderEventBridgeDelegate {
     void onAdsLoaderAdError(AdErrorEvent adErrorEvent);
+
     void onAdsLoaderAdsLoadedWithData(AdsManagerLoadedEvent adsManagerLoadedEvent);
 }
 
