@@ -69,7 +69,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-//    implementation project(path: ':react-native-video')
+    implementation project(path: ':react-native-video')
 }
 
 def configureReactNativePom(def pom) {
