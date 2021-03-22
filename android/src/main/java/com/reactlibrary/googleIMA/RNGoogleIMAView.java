@@ -58,8 +58,6 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     private AdsLoader adsLoader;
     private StreamManager streamManager;
 
-    static public ReactExoplayerViewDelegateInterface subDelegate;
-
     String contentSourceID = "";
     String videoID = "";
     String assetKey = "";
@@ -129,16 +127,12 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         super.addView(child, index, params);
         ReactExoplayerView reactExoplayerView = ReactExoplayerView.findRCTVideo(child);
         if (reactExoplayerView != null) {
-            reactExoplayerView.setDelegate(this);
             initializeVideo(new RNGoogleIMAVideoWrapper(reactExoplayerView));
         }
     }
 
     @Override
     public MediaSource buildMediaSource(ReactExoplayerView reactExoplayerView, Uri uri, String overrideExtension) {
-        if (subDelegate != null && !shouldSetupPlayer) {
-            return subDelegate.buildMediaSource(reactExoplayerView, uri, overrideExtension);
-        }
         return null;
     }
 
