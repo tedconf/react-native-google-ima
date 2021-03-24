@@ -5,6 +5,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url "https://jitpack.io" }
     }
 
     dependencies {
@@ -12,32 +13,6 @@ buildscript {
         // https://github.com/facebook/react-native/blob/0.60-stable/template/android/build.gradle#L16
         classpath("com.android.tools.build:gradle:${safeExtGet('gradlePluginVersion', '3.4.1')}")
     }
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'maven'
-
-// Matches values in recent template from React Native 0.59 / 0.60
-// https://github.com/facebook/react-native/blob/0.59-stable/template/android/build.gradle#L5-L9
-// https://github.com/facebook/react-native/blob/0.60-stable/template/android/build.gradle#L5-L9
-def DEFAULT_COMPILE_SDK_VERSION = 28
-def DEFAULT_BUILD_TOOLS_VERSION = "28.0.3"
-def DEFAULT_MIN_SDK_VERSION = 16
-def DEFAULT_TARGET_SDK_VERSION = 28
-
-android {
-  compileSdkVersion safeExtGet('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
-  buildToolsVersion safeExtGet('buildToolsVersion', DEFAULT_BUILD_TOOLS_VERSION)
-
-  defaultConfig {
-    minSdkVersion safeExtGet('minSdkVersion', DEFAULT_MIN_SDK_VERSION)
-    targetSdkVersion safeExtGet('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
-    versionCode 1
-    versionName "1.0"
-  }
-  lintOptions {
-    abortOnError false
-  }
 }
 
 repositories {
@@ -49,10 +24,52 @@ repositories {
         url "$projectDir/../node_modules/react-native/android"
     }
     mavenCentral()
+    google()
+    jcenter()
+}
+
+
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 28)
+    buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 28)
+        versionCode 1
+        versionName "1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation "com.facebook.react:react-native:${safeExtGet('reactnativeVersion', '+')}"
+    implementation 'com.android.support:support-annotations:28.0.0'
+    implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
+
+    implementation "com.google.ads.interactivemedia.v3:interactivemedia:${safeExtGet('googleImaVersion', "3.22.2")}"
+
+    implementation("com.google.android.exoplayer:exoplayer:${safeExtGet('exoplayerVersion', '2.11.4')}") {
+        exclude group: 'com.android.support'
+    }
+
+    implementation project(path: ':react-native-video')
 }
 
 def configureReactNativePom(def pom) {
@@ -62,7 +79,7 @@ def configureReactNativePom(def pom) {
         name packageJson.title
         artifactId packageJson.name
         version = packageJson.version
-        group = "com.reactlibrary.googleDAI"
+        group = "com.reactlibrary.googleIMA"
         description packageJson.description
         url packageJson.repository.baseUrl
 
@@ -84,14 +101,12 @@ def configureReactNativePom(def pom) {
 }
 
 afterEvaluate { project ->
-
     task androidJavadoc(type: Javadoc) {
         source = android.sourceSets.main.java.srcDirs
         classpath += files(android.bootClasspath)
         classpath += files(project.getConfigurations().getByName('compile').asList())
         include '**/*.java'
     }
-
     task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
         classifier = 'javadoc'
         from androidJavadoc.destinationDir
@@ -109,12 +124,10 @@ afterEvaluate { project ->
             from variant.javaCompile.destinationDir
         }
     }
-
     artifacts {
         archives androidSourcesJar
         archives androidJavadocJar
     }
-
     task installArchives(type: Upload) {
         configuration = configurations.archives
         repositories.mavenDeployer {

@@ -1,0 +1,75 @@
+# TED Tech uses TedAppMetaData to track git repositories.
+# Check docs here for more info:
+# https://github.com/tedconf/ted_app_meta_data
+
+# Version refers to the TedAppMetaData schema version;
+# not the version of the project it's describing.
+version: 1.3
+
+# Vertical should be one of the approved vertical values.
+# Check docs here for the latest list:
+# https://github.com/tedconf/ted_app_meta_data
+# this should alway be lower cased
+squad: devices
+
+# Production and Staging endpoint can be any appropriate URL where
+# this project is hosted; e.g. an API root or a full website.
+# Blank values may be used for libraries that have no dedicated
+# hosting, but do not omit the Yaml keys.
+production:
+  endpoint_url:
+staging:
+  endpoint_url:
+
+# optional: usually a link to airbrake
+error_collector_url:
+
+# optional: usually a link to Jenkins
+ci_url:
+
+# optional: list of (name, value) pairs of links to graphs about this application
+# typically links to kibana, but you do you... put what ever you want here.
+#
+# Note: If your "name" for any of these lists has [] in it you need to quote the whole string
+# IE:  name: "[cool wiki link here] some other text"
+#
+# These links will show up here: https://tech-guides.ted.com/app_links.html
+# If you don't populate these please leave the graphs key empty.
+graphs:
+  # - name: 'some awesome graph about thing 1'
+  #   url: http://some-long-kibana-link-1
+  # - name: 'some awesome graph about thing 2'
+  #   url: http://some-long-kibana-link-2
+
+# optional: list of (name value) pairs of links to really anything that is not a graph.
+references:
+  # - name: 'some awesome gdoc'
+  #   url: http://some-long-gdoc-link-1
+  # - name: 'some other gdoc'
+  #   url: http://some-long-gdoc-link-2
+
+# optional: list of langauges this repo primarily uses
+# suggested standardized keys for languages we use/have used (add yours if it's not here):
+#   ruby
+#   javascript (browser-based)
+#   typescript (client)
+#   typescript (server)
+#   node       (service)
+#   go
+#   hcl        (terraform)
+#   bash
+#   php
+primary_languages:
+  - node
+  - javascript
+# these tags are used by the documentation wiki
+wiki_categories:
+  - react-native
+  - google-ima
+  - google-dai
+# support level
+# - "Full"
+# - "Minimum":
+# - "EOL"
+# - "EOL-UI" (for retired ember or react components)
+support_level: Full
