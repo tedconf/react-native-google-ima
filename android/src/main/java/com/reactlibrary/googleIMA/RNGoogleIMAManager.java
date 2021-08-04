@@ -83,25 +83,39 @@ public class RNGoogleIMAManager extends ViewGroupManager<RNGoogleIMAView> {
     return MapBuilder.<String, Object>builder()
       .put(
         "onAdsLoaderLoaded",
-        MapBuilder.of("registrationName", "onAdsLoaderLoaded"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onAdsLoaderLoaded")))
       .put(
         "onAdsLoaderFailed",
-        MapBuilder.of("registrationName", "onAdsLoaderFailed"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onAdsLoaderFailed")))
       .put(
         "onStreamManagerAdEvent",
-        MapBuilder.of("registrationName", "onStreamManagerAdEvent"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onStreamManagerAdEvent")))
       .put(
         "onStreamManagerAdProgress",
-        MapBuilder.of("registrationName", "onStreamManagerAdProgress"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onStreamManagerAdProgress")))
       .put(
         "onStreamManagerAdError",
-        MapBuilder.of("registrationName", "onStreamManagerAdError"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onStreamManagerAdError")))
       .put(
         "onAdsManagerAdEvent",
-        MapBuilder.of("registrationName", "onAdsManagerAdEvent"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onAdsManagerAdEvent")))
       .put(
         "onAdsManagerAdError",
-        MapBuilder.of("registrationName", "onAdsManagerAdError"))
+        MapBuilder.of(
+          "phasedRegistrationNames",
+          MapBuilder.of("bubbled", "onAdsManagerAdError")))
       .build();
   }
 }

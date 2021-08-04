@@ -84,11 +84,11 @@ public class RNGoogleIMAVideoWrapper {
   }
 
   public long getCurrentPositionMs() {
-    return 0;
+    return reactExoplayerView.getProgress();
   }
 
   public long getDuration() {
-    return 0;
+    return reactExoplayerView.getDuration();
   }
 
   // Methods for exposing player information.

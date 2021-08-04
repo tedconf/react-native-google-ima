@@ -63,7 +63,7 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
-    implementation "com.google.ads.interactivemedia.v3:interactivemedia:${safeExtGet('googleImaVersion', "3.22.2")}"
+    implementation "com.google.ads.interactivemedia.v3:interactivemedia:${safeExtGet('googleImaVersion', "3.24.0")}"
 
     implementation("com.google.android.exoplayer:exoplayer:${safeExtGet('exoplayerVersion', '2.11.4')}") {
         exclude group: 'com.android.support'

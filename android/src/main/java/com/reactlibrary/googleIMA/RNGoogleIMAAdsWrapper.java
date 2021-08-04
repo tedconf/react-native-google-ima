@@ -3,6 +3,7 @@ package com.reactlibrary.googleIMA;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
@@ -295,6 +296,8 @@ public class RNGoogleIMAAdsWrapper
   private void log(String message) {
     if (logger != null) {
       logger.log(message);
+//    } else {
+//      Log.d("ReactNative", message);
     }
   }
 }

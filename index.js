@@ -1,6 +1,11 @@
-import React, { Component } from "react";
-import { requireNativeComponent, ViewPropTypes, View } from "react-native";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import {
+  requireNativeComponent,
+  ViewPropTypes,
+  View,
+  StyleSheet,
+} from 'react-native';
+import PropTypes from 'prop-types';
 
 class RNGoogleIMA extends Component {
   _assignRoot = (component) => {
@@ -54,13 +59,13 @@ class RNGoogleIMA extends Component {
         onAdsManagerAdError={onAdsManagerAdError}
         pointerEvents="box-none"
       >
+        {children}
         <View
           testID="adContainerView"
           nativeID="adContainerView"
-          style={adContainerStyle}
+          style={[styles.adContainerStyle, adContainerStyle]}
           pointerEvents="box-none"
         />
-        {children}
       </RCTRNGoogleIMA>
     );
   }
@@ -87,7 +92,13 @@ RNGoogleIMA.propTypes = {
 
 // const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', null);
 
-const RCTRNGoogleIMA = requireNativeComponent("RNGoogleIMA", RNGoogleIMA, {
+const styles = StyleSheet.create({
+  adContainerStyle: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
+
+const RCTRNGoogleIMA = requireNativeComponent('RNGoogleIMA', RNGoogleIMA, {
   nativeOnly: {
     playFallbackContent: true,
     componentWillUnmount: true,

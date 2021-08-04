@@ -1,5 +1,7 @@
 package com.reactlibrary.googleIMA;
 
+import android.util.Log;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -12,9 +14,11 @@ import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdPodInfo;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
+import com.google.ads.interactivemedia.v3.api.CuePoint;
 import com.google.ads.interactivemedia.v3.api.StreamManager;
 import com.google.ads.interactivemedia.v3.api.UiElement;
 
+import java.util.List;
 import java.util.Map;
 
 public class RNGoogleIMAConverters {
@@ -68,127 +72,45 @@ public class RNGoogleIMAConverters {
     return writableArray;
   }
 
-  public static WritableMap convertAdEvent(AdEvent adEvent) {
+  public static WritableMap convertAdEvent(AdEvent adEvent, List<CuePoint> cuepoints) {
     if (adEvent != null) {
-      String adEventTypeString = null;
-      switch (adEvent.getType()) {
-//                    case AdEvent.AdEventType.STREAM_LOADED: {
-//                        adEventTypeString = "STREAM_LOADED";
-//                        break;
-//                    }
-//                    case AdEvent.AdEventType.STREAM_STARTED: {
-//                        adEventTypeString = "STREAM_STARTED";
-//                        break;
-//                    }
-        case AD_BREAK_READY: {
-          adEventTypeString = "AD_BREAK_READY";
-          break;
-        }
-        case AD_BREAK_STARTED: {
-          adEventTypeString = "AD_BREAK_STARTED";
-          break;
-        }
-        case AD_BREAK_ENDED: {
-          adEventTypeString = "AD_BREAK_ENDED";
-          break;
-        }
-        case AD_PERIOD_STARTED: {
-          adEventTypeString = "AD_PERIOD_STARTED";
-          break;
-        }
-        case AD_PERIOD_ENDED: {
-          adEventTypeString = "AD_PERIOD_ENDED";
-          break;
-        }
-        case ALL_ADS_COMPLETED: {
-          adEventTypeString = "ALL_ADS_COMPLETED";
-          break;
-        }
-        case LOADED: {
-          adEventTypeString = "LOADED";
-          break;
-        }
-        case STARTED: {
-          adEventTypeString = "STARTED";
-          break;
-        }
-        case CLICKED: {
-          adEventTypeString = "CLICKED";
-          break;
-        }
-        case TAPPED: {
-          adEventTypeString = "TAPPED";
-          break;
-        }
-        case CUEPOINTS_CHANGED: {
-          adEventTypeString = "CUEPOINTS_CHANGED";
-          break;
-        }
-        case LOG: {
-          adEventTypeString = "LOG";
-          break;
-        }
-        case PAUSED: {
-          adEventTypeString = "PAUSE";
-          break;
-        }
-        case RESUMED: {
-          adEventTypeString = "RESUME";
-          break;
-        }
-        case SKIPPED: {
-          adEventTypeString = "SKIPPED";
-          break;
-        }
-        case FIRST_QUARTILE: {
-          adEventTypeString = "FIRST_QUARTILE";
-          break;
-        }
-        case MIDPOINT: {
-          adEventTypeString = "MIDPOINT";
-          break;
-        }
-        /*
-         *  Third quartile of a linear ad was reached.
-         */
-        case THIRD_QUARTILE: {
-          adEventTypeString = "THIRD_QUARTILE";
-          break;
-        }
-        /*
-         *  Single ad has finished.
-         */
-        case COMPLETED: {
-          adEventTypeString = "COMPLETE";
-          break;
-        }
+      String adEventTypeString = adEvent.getType().toString();
 
-        default:
-          break;
-      }
-      if (adEventTypeString != null) {
-        WritableNativeMap adEventDictionary = new WritableNativeMap();
-        adEventDictionary.putString("type", adEventTypeString);
-        adEventDictionary.putString("typeString", adEvent.getType().name());
-        adEventDictionary.putMap("ad", convertAd(adEvent.getAd()));
-        adEventDictionary.putMap("adData", convertAdData(adEvent.getAdData()));
-        return adEventDictionary;
+      if (adEvent.getType() == AdEvent.AdEventType.COMPLETED) {
+        adEventTypeString = "COMPLETE";
       }
 
+      WritableNativeMap adEventContentsDictionary = new WritableNativeMap();
+      adEventContentsDictionary.putString("type", adEventTypeString);
+      adEventContentsDictionary.putString("typeString", adEvent.getType().name());
+      adEventContentsDictionary.putMap("ad", convertAd(adEvent.getAd()));
+      adEventContentsDictionary.putMap("adData", convertAdData(adEvent.getAdData(), cuepoints));
+
+      WritableNativeMap adEventDictionary = new WritableNativeMap();
+      adEventDictionary.putMap("adEvent", adEventContentsDictionary);
+
+      return adEventDictionary;
     }
     return null;
   }
 
-  public static WritableMap convertAdData(Map<String, String> adData) {
-    if (adData != null) {
-      WritableMap adDataDictionary = Arguments.createMap();
-      String[] keys = (String[]) adData.keySet().toArray();
-      for (String key : keys) {
-        if (key.equals("cuepoints")) {
-          adDataDictionary.putString(key, adData.get(key));
-//                    adDataDictionary.putArray(key, convertArray());
-        }
+  public static WritableMap convertAdData(Map<String, String> adData, List<CuePoint> cuepoints) {
+    WritableMap adDataDictionary = Arguments.createMap();
+    if (cuepoints != null) {
+      WritableArray cuepointsList = Arguments.createArray();
+      for (CuePoint cuePoint : cuepoints) {
+        cuepointsList.pushMap(convertAdCuepoint(cuePoint));
       }
+      adDataDictionary.putArray("cuepoints", cuepointsList);
+    }
+    if (adData != null) {
+      String[] keys = (String[]) adData.keySet().toArray();
+//      for (String key : keys) {
+//        if (key.equals("cuepoints")) {
+//          adDataDictionary.putString(key, adData.get(key));
+////                    adDataDictionary.putArray(key, convertArray());
+//        }
+//      }
 //            for (int i = 0; i < keys.length; i++)
 //            {
 //                String key = keys[i];
@@ -205,9 +127,21 @@ public class RNGoogleIMAConverters {
 ////                [adDataDictionary setValue:cuepointsMutable forKey:key];
 //
 //            }
-      return adDataDictionary;
     }
-    return null;
+    return adDataDictionary;
+  }
+
+
+  public static WritableMap convertAdCuepoint(CuePoint cuepoint) {
+    WritableMap adDataDictionary = Arguments.createMap();
+
+    if (cuepoint != null) {
+      adDataDictionary.putDouble("startTime", cuepoint.getStartTime());
+      adDataDictionary.putDouble("endTime", cuepoint.getEndTime());
+      adDataDictionary.putBoolean("played", cuepoint.isPlayed());
+    }
+
+    return adDataDictionary;
   }
 
   public static WritableMap convertAd(Ad ad) {
