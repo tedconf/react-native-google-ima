@@ -64,7 +64,7 @@ class RNGoogleIMA extends Component {
           testID="adContainerView"
           nativeID="adContainerView"
           style={[styles.adContainerStyle, adContainerStyle]}
-          pointerEvents="box-none"
+          // pointerEvents="box-none"
         />
       </RCTRNGoogleIMA>
     );
@@ -95,6 +95,8 @@ RNGoogleIMA.propTypes = {
 const styles = StyleSheet.create({
   adContainerStyle: {
     ...StyleSheet.absoluteFillObject,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
 });
 

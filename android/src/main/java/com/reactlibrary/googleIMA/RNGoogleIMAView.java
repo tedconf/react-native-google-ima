@@ -4,11 +4,12 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
-import android.os.Build;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 
@@ -60,6 +61,7 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
   private RNGoogleIMAVideoWrapper videoPlayer;
   private Context context;
   private ViewGroup adUiContainer;
+  private FrameLayout innerLayout;
 
   private String fallbackUrl;
   private Logger logger;
@@ -81,14 +83,14 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     streamManagerEventBridge = new StreamManagerEventBridge(this);
     adsLoaderEventBridge = new AdsLoaderEventBridge(this);
     initialize();
+
+    addOnLayoutChangeListener(this::onLayoutChange);
   }
 
   private void initialize() {
     sdkFactory = ImaSdkFactory.getInstance();
     playerCallbacks = new ArrayList<>();
   }
-
-  ;
 
   public void setContentSourceID(String contentSourceID) {
     this.contentSourceID = contentSourceID;
@@ -164,7 +166,6 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     adDisplayContainer = null;
   }
 
-
   void invalidatePlayer() {
     invalidateStreamManager();
     invalidateAdsLoader();
@@ -207,13 +208,19 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
     ImaSdkSettings settings = sdkFactory.createImaSdkSettings();
     settings.setPlayerType("RNGoogleIMA");
 
-//    enableWebViewDebugging();
     VideoStreamPlayer videoStreamPlayer = createVideoStreamPlayer();
-    ViewGroup adUiContainer = (ViewGroup) ReactFindViewUtil.findView(this, "adContainerView");
+    adUiContainer = (ViewGroup) ReactFindViewUtil.findView(this, "adContainerView");
+    if (adUiContainer == null) {
+      return;
+    }
+
+    adUiContainer.removeOnLayoutChangeListener(this::onLayoutChangeAdUiContainer);
+    adUiContainer.addOnLayoutChangeListener(this::onLayoutChangeAdUiContainer);
+    adUiContainer.removeAllViews();
+    reLayout();
 
     adDisplayContainer =
-      sdkFactory.createStreamDisplayContainer(adUiContainer, videoStreamPlayer);
-
+      ImaSdkFactory.createStreamDisplayContainer(adUiContainer, videoStreamPlayer);
 
     videoPlayer.setSampleVideoPlayerCallback(
       new RNGoogleIMAVideoWrapper.SampleVideoPlayerCallback() {
@@ -239,6 +246,38 @@ public class RNGoogleIMAView extends ReactViewGroup implements ReactExoplayerVie
         }
       });
     adsLoader = sdkFactory.createAdsLoader(getContext(), settings, adDisplayContainer);
+  }
+
+  @Override
+  protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+    super.onLayout(changed, left, top, right, bottom);
+
+    reLayout();
+  }
+
+  public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+    reLayout();
+  }
+
+  public void onLayoutChangeAdUiContainer(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+    reLayout();
+  }
+
+  private void reLayout() {
+    if (adUiContainer == null) return;
+    int l = adUiContainer.getChildCount();
+
+    int measuredWidth = adUiContainer.getMeasuredWidth();
+    int measureSpecWidth = MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY);
+    int measuredHeight = adUiContainer.getMeasuredHeight();
+    int measureSpecHeight = MeasureSpec.makeMeasureSpec(measuredHeight, MeasureSpec.EXACTLY);
+
+    for (int i = 0; i < l; i++) {
+      View view = adUiContainer.getChildAt(i);
+      view.measure(measureSpecWidth, measureSpecHeight);
+      view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+    }
+
   }
 
   @TargetApi(19)
