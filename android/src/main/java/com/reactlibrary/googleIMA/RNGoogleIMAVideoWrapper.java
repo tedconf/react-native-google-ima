@@ -46,7 +46,9 @@ public class RNGoogleIMAVideoWrapper {
   public void play() {
     if (streamUrl != null) {
       reactExoplayerView.setSrc(Uri.parse(streamUrl), "", new HashMap<String, String>(), false);
-      reactExoplayerView.setPausedModifier(false);
+      reactExoplayerView.resetAudioFocus();
+      reactExoplayerView.setPlayWhenReady(true);
+      reactExoplayerView.startPlayback();
     } else {
       playFallback();
     }
