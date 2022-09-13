@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import {
   requireNativeComponent,
-  ViewPropTypes,
   View,
   StyleSheet,
 } from "react-native";
 import PropTypes from "prop-types";
+import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 
 class RNGoogleIMA extends Component {
   _assignRoot = (component) => {
