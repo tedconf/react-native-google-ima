@@ -1,7 +1,7 @@
 #include <AVFoundation/AVFoundation.h>
 #import <React/RCTView.h>
 #import <react-native-video/RCTVideo.h>
-#import "UIView+React.h"
+#import <React/UIView+React.h>
 
 @import GoogleInteractiveMediaAds;
 

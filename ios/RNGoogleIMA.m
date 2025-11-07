@@ -1,6 +1,6 @@
 #import "RNGoogleIMA.h"
 #import "RNGoogleIMAConverters.m"
-#import "UIView+React.h"
+#import <React/UIView+React.h>
 
 static NSString *const statusKeyPath = @"status";
 static NSString *const rctVideoNativeID = @"RNGoogleIMAPlayer";
@@ -196,6 +196,17 @@ NSDictionary* _imaSettings;
 
 -(BOOL) shouldSetupPlayerItem:(AVPlayerItem *) playerItem forSource:(NSDictionary *) source {
     if (_enabled) {
+        // Check if source has a valid URI
+        NSString *uri = [source objectForKey:@"uri"];
+        if (!uri || [uri isEqualToString:@""] || [uri isEqualToString:@"null"]) {
+            // Source is empty, don't setup IMA
+            NSLog(@"IMA >>> shouldSetupPlayerItem: Empty source URI, skipping IMA setup");
+            _contentPlayer = nil;
+            _fallbackPlayerItem = nil;
+            _source = nil;
+            return NO;
+        }
+
         if (_rctVideo && _contentSourceID != nil && (_assetKey != nil || _videoID != nil)) {
             _fallbackPlayerItem = playerItem;
             _source = source;
@@ -211,8 +222,10 @@ NSDictionary* _imaSettings;
             // }
 
             [self requestStreamForSource: source];
-            // NSLog(@"IMA >>> willSetupPlayerItem YES! uri: %@", [source objectForKey:@"uri"]);
+            NSLog(@"IMA >>> willSetupPlayerItem YES! contentSourceID: %@, videoID: %@, assetKey: %@, uri: %@", _contentSourceID, _videoID, _assetKey, uri);
             return YES;
+        } else {
+            NSLog(@"IMA >>> shouldSetupPlayerItem: Missing required props - rctVideo: %d, contentSourceID: %@, assetKey: %@, videoID: %@", _rctVideo != nil, _contentSourceID, _assetKey, _videoID);
         }
         _contentPlayer = nil;
         _fallbackPlayerItem = nil;
@@ -256,6 +269,7 @@ NSDictionary* _imaSettings;
     }
 
     [request setAdTagParameters:_adTagParameters];
+    NSLog(@"IMA >>> Requesting stream with adTagParameters: %@", _adTagParameters);
 
     [self setupAdsLoader];
 
@@ -315,11 +329,18 @@ NSDictionary* _imaSettings;
 }
 
 - (void)adsLoader:(IMAAdsLoader *)loader failedWithErrorData:(IMAAdLoadingErrorData *)adErrorData {
-    // NSLog(@"IMA >>> adsLoader:failedWithErrorData");
+    NSDictionary *errorDict = convertAdLoadingErrorData(adErrorData);
+    NSDictionary *adError = [errorDict objectForKey:@"adError"];
+    NSNumber *errorType = [adError objectForKey:@"type"];
+    NSNumber *errorCode = [adError objectForKey:@"code"];
+    NSString *errorMessage = [adError objectForKey:@"message"];
+
+    NSLog(@"IMA >>> adsLoader:failedWithErrorData - Type: %@, Code: %@, Message: %@", errorType, errorCode, errorMessage);
+
     if (self.onAdsLoaderFailed) {
         self.onAdsLoaderFailed(
                                @{
-                                 @"adErrorData": convertAdLoadingErrorData(adErrorData),
+                                 @"adErrorData": errorDict,
                                  @"target": self.reactTag
                                  });
     }
@@ -345,17 +366,17 @@ NSDictionary* _imaSettings;
 }
 
 - (void)adsManager:(IMAAdsManager *)adsManager didReceiveAdError:(IMAAdError *)error {
-    // NSLog(@"IMA >>> adsManager:didReceiveAdError");
-    // Something went wrong with the ads manager after ads were loaded. Log the error and play the
-    // content.
-    // NSLog(@"AdsManager error: %@", error.message);
-    // [self.contentPlayer play];
-    // [_contentPlayer play];
-    // NSLog(@"IMA >>> onAdsManagerAdError");
+    NSDictionary *errorDict = convertAdError(error);
+    NSNumber *errorType = [errorDict objectForKey:@"type"];
+    NSNumber *errorCode = [errorDict objectForKey:@"code"];
+    NSString *errorMessage = [errorDict objectForKey:@"message"];
+
+    NSLog(@"IMA >>> adsManager:didReceiveAdError - Type: %@, Code: %@, Message: %@", errorType, errorCode, errorMessage);
+
     if (self.onAdsManagerAdError) {
         self.onAdsManagerAdError(
                                     @{
-                                      @"error": convertAdError(error),
+                                      @"error": errorDict,
                                       @"target": self.reactTag
                                       });
     }
@@ -405,11 +426,17 @@ NSDictionary* _imaSettings;
 }
 
 - (void)streamManager:(IMAStreamManager *)streamManager didReceiveAdError:(IMAAdError *)error {
-    NSLog(@"IMA >>> onStreamManagerAdError");
+    NSDictionary *errorDict = convertAdError(error);
+    NSNumber *errorType = [errorDict objectForKey:@"type"];
+    NSNumber *errorCode = [errorDict objectForKey:@"code"];
+    NSString *errorMessage = [errorDict objectForKey:@"message"];
+
+    NSLog(@"IMA >>> onStreamManagerAdError - Type: %@, Code: %@, Message: %@", errorType, errorCode, errorMessage);
+
     if (self.onStreamManagerAdError) {
         self.onStreamManagerAdError(
                                     @{
-                                      @"error": convertAdError(error),
+                                      @"error": errorDict,
                                       @"target": self.reactTag
                                       });
     }
